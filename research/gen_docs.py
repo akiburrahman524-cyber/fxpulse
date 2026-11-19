@@ -252,6 +252,10 @@ L.append("Read: on 5-minute bars the ambiguity is negligible (%d of %d trades) -
          "Whoever reruns this can pick their own convention - both are shipped.\n" % (
     amb["5-minute"][1], amb["5-minute"][0], amb["1-hour"][1], amb["1-hour"][0],
     100.0 * amb["1-hour"][1] / max(1, amb["1-hour"][0]), amb["1-hour"][2]))
+L.append("Could finer data narrow the hourly bound? Not with what is freely available: the 5-minute feed only reaches back "
+         "~60 days, so it overlaps just a handful of the ambiguous hourly trades - too few to move the bound. Resolving the "
+         "rest would need a paid tick/minute history, which is outside this project's free-only scope. The bound above is "
+         "therefore the honest answer on free data.\n")
 L.append("## Parameter sensitivity (the noise signature)\n")
 L.append("If the rule had a real edge, nearby parameters would agree. They do not. Net avg R for follow/or-mid/1R:\n")
 L.append("| pair | 5m: 07:00/30min | 5m: 07:00/60min | 5m: 08:00/30min | 5m: 08:00/60min |")

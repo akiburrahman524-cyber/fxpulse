@@ -4,6 +4,8 @@ Free, open analysis tools for the forex market: session scanner, entry/stop/targ
 
 Everything is plain Python 3.8+, standard library only. Nothing to install. Nothing here connects to a broker, places an order, or moves money. Nothing here is financial advice.
 
+> **Research and education only - not for live trading.** Every number here is a simulation on unofficial data with modeled costs. Real defects in this arithmetic have been found and fixed after publication - including a 100x error in JPY-pair position sizing and a cost model that flattered results (see CHANGELOG.md) - and there is no assurance every defect has been found. Independently verify ANY number you rely on, especially position sizes, against your broker's own figures. Never trade money you cannot afford to lose on this project's output.
+
 Inspired by the methodology of [Jakeschincariol/day-trader-skill](https://github.com/Jakeschincariol/day-trader-skill) (US stocks), re-implemented from scratch for forex.
 
 ## The tools

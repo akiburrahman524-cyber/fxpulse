@@ -45,6 +45,9 @@ def size_position(pair, stop_pips, balance, risk_amount=None, risk_pct=None, pri
         "max_loss_usd_at_floored_units": round(stop_pips * pv * units / 100000.0, 2),
         "note": ("Sizing arithmetic with Frankfurter reference rates for pip values. "
                  "Brokers quote their own pip values and lot steps; check yours. "
+                 "A 100x error in this tool's JPY-pair pip values was found and fixed on "
+                 "2026-11-19 (see CHANGELOG.md) - verify any size against your broker's "
+                 "own numbers before relying on it. "
                  "Simulation aid, not advice."),
     }
 

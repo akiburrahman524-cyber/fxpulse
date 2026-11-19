@@ -218,6 +218,8 @@ When one bar's range touches BOTH the stop and the target, OHLC data cannot say 
 
 Read: on 5-minute bars the ambiguity is negligible (1 of 483 trades) - the conservative convention costs almost nothing. On hourly bars 168 of 7123 trades (2.4%) contain an ambiguous bar, and the bound is wide for some pairs. The truth sits between the two columns; even at the unreachable upper bound, 9 of 10 pairs still lose over the sample, and the no-edge conclusion stands under EITHER resolution. Whoever reruns this can pick their own convention - both are shipped.
 
+Could finer data narrow the hourly bound? Not with what is freely available: the 5-minute feed only reaches back ~60 days, so it overlaps just a handful of the ambiguous hourly trades - too few to move the bound. Resolving the rest would need a paid tick/minute history, which is outside this project's free-only scope. The bound above is therefore the honest answer on free data.
+
 ## Parameter sensitivity (the noise signature)
 
 If the rule had a real edge, nearby parameters would agree. They do not. Net avg R for follow/or-mid/1R:

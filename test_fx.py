@@ -125,6 +125,18 @@ check("cost reduces avg R by exactly cost_r (buy)", abs((sc0["avg_r"] - sc1["avg
 check("cost reduces avg R by exactly cost_r (sell)", abs((sc0s["avg_r"] - sc1s["avg_r"]) - 0.02) < 1e-9)
 check("cost is adverse", sc1["avg_r"] < sc0["avg_r"] and sc1s["avg_r"] < sc0s["avg_r"])
 
+# --- pip-value dimensional invariants, independent of implementation constants:
+# (USD value of one pip per lot) x (quote units per USD price) must equal the
+# quote units of one pip per lot, i.e. pip_size x 100,000, for any quote currency
+for _pair, _px in (("USDJPY", 150.0), ("USDCHF", 0.90), ("USDCAD", 1.35)):
+    check("pip value invariant %s" % _pair,
+          abs(fxdata.pip_value_usd(_pair, price=_px) * _px - fxdata.pip_size(_pair) * 100000.0) < 1e-6)
+check("JPY pip is 1000 quote units per lot", fxdata.pip_size("USDJPY") * 100000.0 == 1000.0)
+_outj = fx_size.size_position("USDJPY", 15.0, 5000.0, risk_amount=50.0, price=150.0)
+# identity holds up to the 4-decimal display rounding of the output fields
+check("sizing identity USDJPY", abs(_outj["standard_lots"] * 15.0 * _outj["pip_value_usd_per_std_lot"] - 50.0) < 0.01)
+check("sizing USDJPY sane magnitude", _outj["standard_lots"] < 5.0)  # the 100x defect produced ~53
+
 # --- sizing: units rounded DOWN, never risk more than intended
 out2 = fx_size.size_position("EURUSD", 15.0, 5000.0, risk_amount=50.0)
 check("units rounded down to 100s", out2["units_approx"] <= out2["standard_lots"] * 100000 and out2["units_approx"] % 100 == 0)
