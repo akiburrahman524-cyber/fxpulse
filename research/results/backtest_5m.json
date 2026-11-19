@@ -8395,7 +8395,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.4939,
+        0.0687
+      ]
     },
     "GBPUSD": {
       "days": 49,
@@ -8855,7 +8859,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.4929,
+        0.0851
+      ]
     },
     "USDJPY": {
       "days": 47,
@@ -9297,7 +9305,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.1998,
+        0.3861
+      ]
     },
     "USDCHF": {
       "days": 47,
@@ -9739,7 +9751,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.5284,
+        0.0049
+      ]
     },
     "USDCAD": {
       "days": 47,
@@ -10181,7 +10197,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.5885,
+        -0.0262
+      ]
     },
     "AUDUSD": {
       "days": 49,
@@ -10641,7 +10661,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.5007,
+        0.0618
+      ]
     },
     "NZDUSD": {
       "days": 49,
@@ -11101,7 +11125,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.5357,
+        0.0315
+      ]
     },
     "EURGBP": {
       "days": 49,
@@ -11561,7 +11589,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.6858,
+        -0.1185
+      ]
     },
     "EURJPY": {
       "days": 48,
@@ -12012,7 +12044,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 1,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.2001,
+        0.3411
+      ]
     },
     "GBPJPY": {
       "days": 49,
@@ -12472,7 +12508,11 @@
         }
       ],
       "trades_with_ambiguous_bar": 0,
-      "tie_break": "stop"
+      "tie_break": "stop",
+      "avg_r_bootstrap_ci95": [
+        -0.6078,
+        -0.0639
+      ]
     }
   },
   "random_control": {
@@ -12556,7 +12596,7 @@
     "max_drawdown_pct": 9.56,
     "total_trades": 483
   },
-  "run_utc": "2026-11-19T04:45:54.643077+00:00",
+  "run_utc": "2026-11-19T04:58:38.873326+00:00",
   "headline_optimistic_tiebreak": {
     "EURUSD": {
       "days": 49,

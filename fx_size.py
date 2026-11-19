@@ -22,10 +22,16 @@ PLAN_PATH = os.path.join(HERE, "plan.json")
 
 
 def size_position(pair, stop_pips, balance, risk_amount=None, risk_pct=None, price=None):
+    if balance <= 0:
+        raise RuntimeError("balance must be positive")
     if risk_amount is None:
         if risk_pct is None:
             raise RuntimeError("pass --risk or --risk-pct")
         risk_amount = balance * risk_pct / 100.0
+    if risk_amount <= 0:
+        raise RuntimeError("risk amount must be positive")
+    if risk_amount > balance:
+        raise RuntimeError("risk amount exceeds the balance")
     if stop_pips <= 0:
         raise RuntimeError("stop must be a positive number of pips")
     pv = fxdata.pip_value_usd(pair, price=price)

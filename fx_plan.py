@@ -57,6 +57,8 @@ def build_plan(pair, side, target_r, stop_rule, session_open_min, or_bars,
         else:
             entry = last if last < lo else lo
     if stop is None:
+        if stop_rule == "fixed":
+            raise RuntimeError("--stop-rule fixed needs --stop")
         stop = {"or-mid": mid, "or-far": (lo if side == "buy" else hi)}[stop_rule]
     if target is None:
         risk = abs(entry - stop)

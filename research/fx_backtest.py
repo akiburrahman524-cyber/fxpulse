@@ -171,7 +171,7 @@ def run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng=Non
 
 def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
                   or_bars, spread_mult, series_cache, rng=None, trade_log=False, tie="stop",
-                  cost_model="fill"):
+                  cost_model="fill", bootstrap=False):
     pip = fxdata.pip_size(pair)
     half_spread = SPREAD_PIPS[pair] * spread_mult * pip / 2.0
     days = fx_scan.split_days(bars)
@@ -215,6 +215,8 @@ def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
     out = summarize(curve, rs, pnls, n_days, log)
     out["trades_with_ambiguous_bar"] = n_amb
     out["tie_break"] = tie
+    if bootstrap:
+        out["avg_r_bootstrap_ci95"] = bootstrap_ci(rs, n_boot=2000)
     return out
 
 def summarize(curve, rs, pnls, n_days, log=None):
@@ -311,7 +313,7 @@ def main():
     headline_opt = {}
     for pair in PAIRS:
         r = backtest_pair(pair, bars_by_pair[pair], iv, "follow", "or-mid", 1.0, 8, or_bars, 1.0,
-                          series_cache, trade_log=True)
+                          series_cache, trade_log=True, bootstrap=True)
         headline[pair] = r
         r_opt = backtest_pair(pair, bars_by_pair[pair], iv, "follow", "or-mid", 1.0, 8, or_bars, 1.0,
                               series_cache, tie="target")

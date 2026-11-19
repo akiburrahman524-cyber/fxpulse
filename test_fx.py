@@ -142,6 +142,25 @@ out2 = fx_size.size_position("EURUSD", 15.0, 5000.0, risk_amount=50.0)
 check("units rounded down to 100s", out2["units_approx"] <= out2["standard_lots"] * 100000 and out2["units_approx"] % 100 == 0)
 check("floored units risk no more than intended", out2["max_loss_usd_at_floored_units"] <= 50.0 + 1e-9)
 
+# --- sizing input validation
+for _bad in (lambda: fx_size.size_position("EURUSD", 15, 5000, risk_amount=0),
+             lambda: fx_size.size_position("EURUSD", 15, -100, risk_amount=50),
+             lambda: fx_size.size_position("EURUSD", 15, 5000, risk_amount=6000)):
+    try:
+        _bad()
+        check("size_position rejects bad input", False)
+    except RuntimeError:
+        check("size_position rejects bad input", True)
+
+# --- bootstrap CI sanity (research module, offline)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "research"))
+import fx_backtest as _bt  # noqa: E402
+_rs = [1.0] * 40 + [-1.0] * 40
+_ci = _bt.bootstrap_ci(_rs, n_boot=500, seed=1)
+check("bootstrap ci ordered", _ci[0] <= _ci[1])
+check("bootstrap ci brackets mean", _ci[0] <= 0.0 <= _ci[1])
+check("bootstrap ci deterministic", _ci == _bt.bootstrap_ci(_rs, n_boot=500, seed=1))
+
 # --- bar freshness
 import time as _t
 fresh = [{"ts": int(_t.time()) - 60, "open": 1, "high": 1, "low": 1, "close": 1}]

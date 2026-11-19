@@ -164,12 +164,20 @@ L.append("Read: in %d of %d pair-samples the legacy model reported a HIGHER aver
 for label, B in (("5-minute bars, last ~60 trading days", B5), ("1-hour bars, 2024-02 to 2026-11 (~2.8 years)", B1)):
     L.append("## Headline variant on %s\n" % label)
     L.append("Follow-the-breakout, stop or-mid, target 1R, 08:00 London, net costs. Each pair traded independently with $10,000 simulated capital.\n")
-    L.append("| pair | trades | win % | avg R/trade | return | max drawdown | profit factor | t-stat |")
-    L.append("| --- | --- | --- | --- | --- | --- | --- | --- |")
+    L.append("| pair | trades | win % | avg R/trade | avg R 95% CI | return | max drawdown | profit factor | t-stat |")
+    L.append("| --- | --- | --- | --- | --- | --- | --- | --- | --- |")
     for p in PAIRS:
         h = B["headline"][p]
-        L.append("| %s | %d | %s | %s | %s%% | %s%% | %s | %s |" % (
-            p, h["trades"], h["win_rate"], h["avg_r"], h["return_pct"], h["max_drawdown_pct"], h["profit_factor"], h["expectancy_t"]))
+        ci = h.get("avg_r_bootstrap_ci95")
+        ci_txt = "[%+.3f .. %+.3f]" % (ci[0], ci[1]) if ci else "-"
+        L.append("| %s | %d | %s | %s | %s | %s%% | %s%% | %s | %s |" % (
+            p, h["trades"], h["win_rate"], h["avg_r"], ci_txt, h["return_pct"], h["max_drawdown_pct"], h["profit_factor"], h["expectancy_t"]))
+    L.append("")
+    cis = [B["headline"][p].get("avg_r_bootstrap_ci95") for p in PAIRS]
+    straddle = sum(1 for c in cis if c and c[0] <= 0 <= c[1])
+    L.append("The 95%% CI is a bootstrap over that pair's trades (resample the trade R's 2,000 times): the range of average R "
+             "values consistent with this sample's noise. A CI that straddles zero means the sample cannot distinguish the "
+             "variant from break-even; on this sample %d of 10 pairs straddle zero." % straddle)
     pf = B["portfolio"]
     L.append("\nEqual-weight 10-pair portfolio ($10,000 total): **return %s%%, max drawdown %s%%, %d trades**.\n" % (
         pf["return_pct"], pf["max_drawdown_pct"], pf["total_trades"]))

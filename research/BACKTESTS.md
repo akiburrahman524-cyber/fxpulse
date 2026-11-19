@@ -50,18 +50,20 @@ Read: in 19 of 20 pair-samples the legacy model reported a HIGHER average R than
 
 Follow-the-breakout, stop or-mid, target 1R, 08:00 London, net costs. Each pair traded independently with $10,000 simulated capital.
 
-| pair | trades | win % | avg R/trade | return | max drawdown | profit factor | t-stat |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| EURUSD | 49 | 42.9 | -0.211 | -10.03% | 13.83% | 0.65 | -1.51 |
-| GBPUSD | 49 | 44.9 | -0.2047 | -9.77% | 10.95% | 0.66 | -1.43 |
-| USDJPY | 47 | 57.4 | 0.0938 | 4.27% | 6.53% | 1.21 | 0.65 |
-| USDCHF | 47 | 44.7 | -0.2518 | -11.36% | 13.09% | 0.58 | -1.79 |
-| USDCAD | 47 | 40.4 | -0.3239 | -14.34% | 15.62% | 0.52 | -2.24 |
-| AUDUSD | 49 | 46.9 | -0.2177 | -10.35% | 13.08% | 0.65 | -1.52 |
-| NZDUSD | 49 | 49.0 | -0.2573 | -12.07% | 15.06% | 0.58 | -1.81 |
-| EURGBP | 49 | 42.9 | -0.4063 | -18.27% | 18.89% | 0.43 | -2.88 |
-| EURJPY | 48 | 56.2 | 0.0589 | 2.63% | 3.15% | 1.13 | 0.42 |
-| GBPJPY | 49 | 36.7 | -0.3582 | -16.3% | 16.3% | 0.48 | -2.62 |
+| pair | trades | win % | avg R/trade | avg R 95% CI | return | max drawdown | profit factor | t-stat |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EURUSD | 49 | 42.9 | -0.211 | [-0.494 .. +0.069] | -10.03% | 13.83% | 0.65 | -1.51 |
+| GBPUSD | 49 | 44.9 | -0.2047 | [-0.493 .. +0.085] | -9.77% | 10.95% | 0.66 | -1.43 |
+| USDJPY | 47 | 57.4 | 0.0938 | [-0.200 .. +0.386] | 4.27% | 6.53% | 1.21 | 0.65 |
+| USDCHF | 47 | 44.7 | -0.2518 | [-0.528 .. +0.005] | -11.36% | 13.09% | 0.58 | -1.79 |
+| USDCAD | 47 | 40.4 | -0.3239 | [-0.589 .. -0.026] | -14.34% | 15.62% | 0.52 | -2.24 |
+| AUDUSD | 49 | 46.9 | -0.2177 | [-0.501 .. +0.062] | -10.35% | 13.08% | 0.65 | -1.52 |
+| NZDUSD | 49 | 49.0 | -0.2573 | [-0.536 .. +0.032] | -12.07% | 15.06% | 0.58 | -1.81 |
+| EURGBP | 49 | 42.9 | -0.4063 | [-0.686 .. -0.118] | -18.27% | 18.89% | 0.43 | -2.88 |
+| EURJPY | 48 | 56.2 | 0.0589 | [-0.200 .. +0.341] | 2.63% | 3.15% | 1.13 | 0.42 |
+| GBPJPY | 49 | 36.7 | -0.3582 | [-0.608 .. -0.064] | -16.3% | 16.3% | 0.48 | -2.62 |
+
+The 95% CI is a bootstrap over that pair's trades (resample the trade R's 2,000 times): the range of average R values consistent with this sample's noise. A CI that straddles zero means the sample cannot distinguish the variant from break-even; on this sample 7 of 10 pairs straddle zero.
 
 Equal-weight 10-pair portfolio ($10,000 total): **return -9.56%, max drawdown 9.56%, 483 trades**.
 
@@ -118,18 +120,20 @@ Stress test (2x spread), same variant: EURUSD -13.2%, GBPUSD -14.2%, USDJPY +1.6
 
 Follow-the-breakout, stop or-mid, target 1R, 08:00 London, net costs. Each pair traded independently with $10,000 simulated capital.
 
-| pair | trades | win % | avg R/trade | return | max drawdown | profit factor | t-stat |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| EURUSD | 714 | 48.6 | -0.0711 | -41.75% | 52.06% | 0.86 | -1.97 |
-| GBPUSD | 716 | 46.9 | -0.1297 | -61.8% | 63.43% | 0.76 | -3.56 |
-| USDJPY | 711 | 50.4 | -0.0299 | -21.82% | 42.92% | 0.94 | -0.82 |
-| USDCHF | 712 | 50.0 | -0.0869 | -47.97% | 50.34% | 0.83 | -2.37 |
-| USDCAD | 719 | 42.0 | -0.2452 | -83.41% | 83.87% | 0.6 | -6.78 |
-| AUDUSD | 713 | 46.4 | -0.1633 | -69.81% | 71.48% | 0.71 | -4.5 |
-| NZDUSD | 721 | 47.2 | -0.2353 | -82.29% | 84.09% | 0.61 | -6.46 |
-| EURGBP | 713 | 43.8 | -0.261 | -84.96% | 85.19% | 0.57 | -7.24 |
-| EURJPY | 696 | 50.7 | -0.0497 | -31.46% | 38.72% | 0.9 | -1.37 |
-| GBPJPY | 708 | 49.7 | -0.0658 | -39.26% | 42.72% | 0.87 | -1.82 |
+| pair | trades | win % | avg R/trade | avg R 95% CI | return | max drawdown | profit factor | t-stat |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| EURUSD | 714 | 48.6 | -0.0711 | [-0.138 .. -0.000] | -41.75% | 52.06% | 0.86 | -1.97 |
+| GBPUSD | 716 | 46.9 | -0.1297 | [-0.202 .. -0.058] | -61.8% | 63.43% | 0.76 | -3.56 |
+| USDJPY | 711 | 50.4 | -0.0299 | [-0.101 .. +0.037] | -21.82% | 42.92% | 0.94 | -0.82 |
+| USDCHF | 712 | 50.0 | -0.0869 | [-0.157 .. -0.011] | -47.97% | 50.34% | 0.83 | -2.37 |
+| USDCAD | 719 | 42.0 | -0.2452 | [-0.313 .. -0.172] | -83.41% | 83.87% | 0.6 | -6.78 |
+| AUDUSD | 713 | 46.4 | -0.1633 | [-0.228 .. -0.088] | -69.81% | 71.48% | 0.71 | -4.5 |
+| NZDUSD | 721 | 47.2 | -0.2353 | [-0.307 .. -0.166] | -82.29% | 84.09% | 0.61 | -6.46 |
+| EURGBP | 713 | 43.8 | -0.261 | [-0.333 .. -0.187] | -84.96% | 85.19% | 0.57 | -7.24 |
+| EURJPY | 696 | 50.7 | -0.0497 | [-0.118 .. +0.021] | -31.46% | 38.72% | 0.9 | -1.37 |
+| GBPJPY | 708 | 49.7 | -0.0658 | [-0.136 .. +0.006] | -39.26% | 42.72% | 0.87 | -1.82 |
+
+The 95% CI is a bootstrap over that pair's trades (resample the trade R's 2,000 times): the range of average R values consistent with this sample's noise. A CI that straddles zero means the sample cannot distinguish the variant from break-even; on this sample 4 of 10 pairs straddle zero.
 
 Equal-weight 10-pair portfolio ($10,000 total): **return -56.45%, max drawdown 56.77%, 7123 trades**.
 
