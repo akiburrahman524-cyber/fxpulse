@@ -67,6 +67,8 @@ The 95% CI is a bootstrap over that pair's trades (resample the trade R's 2,000 
 
 Equal-weight 10-pair portfolio ($10,000 total): **return -9.56%, max drawdown 9.56%, 483 trades**.
 
+Pooled portfolio avg R/trade: **-0.209**, 95% day-grouped bootstrap CI: **[-0.3336 .. -0.0808]**. This interval resamples whole calendar days, keeping every pair's trades of a sampled day together, so it preserves same-day cross-pair dependence (the per-pair CIs above cannot). Distinct days are still resampled independently, so day-to-day volatility clustering remains unmodeled - this is a dependence-aware bound in one dimension only, and its width relative to a naive trade-level interval is a measured result, not a design guarantee.
+
 P&L by period (USD, net):
 
 | pair | 2026-08/09 | 2026-10/11 |
@@ -136,6 +138,8 @@ Follow-the-breakout, stop or-mid, target 1R, 08:00 London, net costs. Each pair 
 The 95% CI is a bootstrap over that pair's trades (resample the trade R's 2,000 times): the range of average R values consistent with this sample's noise. A CI that straddles zero means the sample cannot distinguish the variant from break-even; on this sample 4 of 10 pairs straddle zero.
 
 Equal-weight 10-pair portfolio ($10,000 total): **return -56.45%, max drawdown 56.77%, 7123 trades**.
+
+Pooled portfolio avg R/trade: **-0.1343**, 95% day-grouped bootstrap CI: **[-0.1639 .. -0.1041]**. This interval resamples whole calendar days, keeping every pair's trades of a sampled day together, so it preserves same-day cross-pair dependence (the per-pair CIs above cannot). Distinct days are still resampled independently, so day-to-day volatility clustering remains unmodeled - this is a dependence-aware bound in one dimension only, and its width relative to a naive trade-level interval is a measured result, not a design guarantee.
 
 P&L by period (USD, net):
 
@@ -274,6 +278,8 @@ Read: shrinking the target raises the win rate only up to a point - the best mea
 - An independent re-implementation of the rule reproduces the repo's own `history_replay` outcome counts EXACTLY on identical data (EURUSD, 49 pool days: buy 13 target / 20 stop / 1 neither; sell 22 / 16 / 3). The shipped code computes what its README says it computes, including its no-same-day-lookahead claim.
 - `python3 test_fx.py` (offline checks incl. DST rules, stop-first tie-break, walk-forward pool construction, adverse-cost accounting and unit rounding): all pass.
 - `fx_timemachine.py run` end-to-end on a live plan (EURUSD buy, 1R, 20,000 replays + 10-day walk-forward): runs, labels its own output correctly as in-sample descriptive statistics, and its walk-forward section honestly states the sample is too small to validate an edge.
+
+- Timemachine replay caveat: each step samples slot j = i +/- window, jittering the intraday slot and flattening FX time-of-day volatility seasonality; --block preserves only short-range serial dependence. Replay distributions are approximate in intraday structure; the walk-forward pools remain strictly out-of-sample by day.
 
 ## Conclusions
 

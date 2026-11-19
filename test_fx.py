@@ -161,6 +161,18 @@ check("bootstrap ci ordered", _ci[0] <= _ci[1])
 check("bootstrap ci brackets mean", _ci[0] <= 0.0 <= _ci[1])
 check("bootstrap ci deterministic", _ci == _bt.bootstrap_ci(_rs, n_boot=500, seed=1))
 
+# day-grouped bootstrap: whole days resampled together (cross-pair same-day dependence)
+_g = _bt.bootstrap_ci_grouped
+_day_rs = [("2026-09-%02d" % (d + 1), v) for d in range(20)
+           for v in ([3.0, 3.0, 3.0] if d % 2 == 0 else [-3.0, -3.0, -3.0])]
+_cg = _g(_day_rs, n_boot=500, seed=1)
+check("grouped bootstrap ci ordered", _cg[0] <= _cg[1])
+check("grouped bootstrap ci brackets mean", _cg[0] <= 0.0 <= _cg[1])
+check("grouped bootstrap deterministic", _cg == _g(_day_rs, n_boot=500, seed=1))
+check("grouped bootstrap None under 5 days", _g([("d1", 1.0), ("d1", -1.0)], n_boot=100, seed=1) is None)
+_ci_iid = _bt.bootstrap_ci([r for _, r in _day_rs], n_boot=500, seed=1)
+check("clustered days widen grouped ci here", (_cg[1] - _cg[0]) > (_ci_iid[1] - _ci_iid[0]))
+
 # --- bar freshness
 import time as _t
 fresh = [{"ts": int(_t.time()) - 60, "open": 1, "high": 1, "low": 1, "close": 1}]

@@ -19,7 +19,10 @@ Method (stated so anyone can check it):
   3. One replay starts at the entry price at the entry slot and walks to
      --until. For each step i it picks slot j = i + randint(-window, window)
      and one random past bar from pool[j], scaled to the current price. The
-     stop is checked before the target within a bar (conservative).
+     stop is checked before the target within a bar (conservative). The slot
+     jitter is an approximation: it flattens FX time-of-day volatility
+     seasonality, so replay paths are approximate in intraday structure
+     (use --block N to preserve short-range serial dependence only).
   4. Outcomes: target / stop (first touch) or neither at --until. R = +targetR
      at the target, -1 at the stop, else (exit-entry)/risk with sign by side.
      The spread is then charged once per replay as an adverse fill cost in R

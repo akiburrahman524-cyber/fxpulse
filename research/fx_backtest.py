@@ -278,6 +278,37 @@ def bootstrap_ci(rs, n_boot=10000, seed=7):
     means.sort()
     return (round(means[int(0.025*n_boot)], 4), round(means[int(0.975*n_boot)], 4))
 
+def bootstrap_ci_grouped(day_rs, n_boot=2000, seed=7):
+    """95% CI for the pooled mean R, resampling whole calendar DAYS (with
+    replacement) and keeping every pair's trades of a sampled day together.
+    Preserves same-day cross-pair dependence, which the per-pair trade-level
+    bootstrap cannot. Distinct days are still resampled independently, so
+    day-to-day volatility clustering is NOT modeled. day_rs: list of
+    (day, r). Statistic: pooled trade-weighted mean R (the same estimand as
+    avg_r over all trades pooled). Whether this interval comes out wider or
+    narrower than a naive trade-level one is an empirical result, not a
+    design guarantee. Returns (lo, hi) or None with <5 distinct days."""
+    days = {}
+    for d, r in day_rs:
+        days.setdefault(d, []).append(r)
+    keys = sorted(days)
+    if len(keys) < 5:
+        return None
+    rng = random.Random(seed)
+    day_lists = [days[k] for k in keys]
+    n = len(keys)
+    means = []
+    for _ in range(n_boot):
+        tot = 0.0
+        cnt = 0
+        for _ in range(n):
+            rs_d = day_lists[rng.randrange(n)]
+            tot += sum(rs_d)
+            cnt += len(rs_d)
+        means.append(tot / cnt)
+    means.sort()
+    return (round(means[int(0.025*n_boot)], 4), round(means[int(0.975*n_boot)], 4))
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--timeframe", choices=["5m", "1h"], required=True)
@@ -385,10 +416,14 @@ def main():
     for _, e in curve:
         peak = max(peak, e)
         maxdd = max(maxdd, (peak - e) / peak)
+    day_rs = [(t["day"], t["r"]) for _, log in port_curves for t in log]
+    all_r = [r for _, r in day_rs]
     results["portfolio"] = {"pairs": PAIRS, "days_with_trades": len(daily),
                             "final_equity": round(eq, 2), "return_pct": round(100*(eq/START_EQUITY-1), 2),
                             "max_drawdown_pct": round(100*maxdd, 2),
-                            "total_trades": sum(len(l) for _, l in port_curves)}
+                            "total_trades": sum(len(l) for _, l in port_curves),
+                            "avg_r_pooled": round(statistics.fmean(all_r), 4) if all_r else None,
+                            "avg_r_day_bootstrap_ci95": bootstrap_ci_grouped(day_rs, n_boot=2000)}
 
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "backtest_%s.json" % iv), "w") as f:
         json.dump(results, f, indent=2)

@@ -4,6 +4,25 @@ Notable corrections and changes, newest first. This project publishes its
 mistakes openly: each entry says what was wrong, what it changed, and where
 the measurement lives.
 
+## 2026-11-19 - Dependence-aware portfolio uncertainty, replay caveat
+
+- The portfolio view now reports a pooled average R with a 95% day-grouped
+  bootstrap CI: whole calendar days are resampled together, keeping every
+  pair's trades of a sampled day in the same draw, so same-day cross-pair
+  dependence is preserved (the per-pair trade-level CIs cannot express it).
+  Measured on this sample: 5-minute portfolio avg R -0.209, CI
+  [-0.3336 .. -0.0808]; 1-hour avg R -0.1343, CI [-0.1639 .. -0.1041]. Both
+  intervals came out wider than the naive trade-level interval and still
+  exclude zero: within these samples the pooled negative expectancy is not
+  explained by same-day correlated noise. The bounds still treat distinct
+  days as independent (day-to-day volatility clustering unmodeled) and say
+  nothing about future performance; the reports state this next to the
+  numbers.
+- `fx_timemachine` documentation now states the replay's slot-jitter
+  approximation plainly: sampling slot j = i +/- window flattens intraday
+  volatility seasonality, so replay paths are approximate in time-of-day
+  structure (walk-forward pools remain strictly out-of-sample by day).
+
 ## 2026-11-19 - Uncertainty reporting and input hardening (9393457)
 
 - Headline backtest tables now carry a bootstrap 95% confidence interval

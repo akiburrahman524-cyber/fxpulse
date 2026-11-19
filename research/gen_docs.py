@@ -181,6 +181,14 @@ for label, B in (("5-minute bars, last ~60 trading days", B5), ("1-hour bars, 20
     pf = B["portfolio"]
     L.append("\nEqual-weight 10-pair portfolio ($10,000 total): **return %s%%, max drawdown %s%%, %d trades**.\n" % (
         pf["return_pct"], pf["max_drawdown_pct"], pf["total_trades"]))
+    gci = pf.get("avg_r_day_bootstrap_ci95")
+    gci_txt = "[%+.4f .. %+.4f]" % (gci[0], gci[1]) if gci else "-"
+    L.append("Pooled portfolio avg R/trade: **%s**, 95%% day-grouped bootstrap CI: **%s**. This interval resamples "
+             "whole calendar days, keeping every pair's trades of a sampled day together, so it preserves same-day "
+             "cross-pair dependence (the per-pair CIs above cannot). Distinct days are still resampled independently, "
+             "so day-to-day volatility clustering remains unmodeled - this is a dependence-aware bound in one "
+             "dimension only, and its width relative to a naive trade-level interval is a measured result, not a "
+             "design guarantee.\n" % (pf.get("avg_r_pooled"), gci_txt))
     # per-year / per-segment table
     seg = {}
     for p in PAIRS:
@@ -326,6 +334,10 @@ L.append("- `python3 test_fx.py` (offline checks incl. DST rules, stop-first tie
          "adverse-cost accounting and unit rounding): all pass.")
 L.append("- `fx_timemachine.py run` end-to-end on a live plan (EURUSD buy, 1R, 20,000 replays + 10-day walk-forward): runs, labels its own output "
          "correctly as in-sample descriptive statistics, and its walk-forward section honestly states the sample is too small to validate an edge.\n")
+L.append("- Timemachine replay caveat: each step samples slot j = i +/- window, jittering the intraday slot and flattening "
+         "FX time-of-day volatility seasonality; --block preserves only short-range serial dependence. Replay "
+         "distributions are approximate in intraday structure; the walk-forward pools remain strictly out-of-sample "
+         "by day.\n")
 L.append("## Conclusions\n")
 L.append("1. **Data: fit for purpose.** Internally consistent, unbiased vs official ECB reference rates, with documented coverage limits.")
 L.append("2. **The shipped strategy has no positive expectancy after realistic costs in any of the tests above.** Before costs it is a coin flip "

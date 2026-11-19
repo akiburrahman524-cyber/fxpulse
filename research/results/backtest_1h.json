@@ -72354,9 +72354,14 @@
     "final_equity": 4354.74,
     "return_pct": -56.45,
     "max_drawdown_pct": 56.77,
-    "total_trades": 7123
+    "total_trades": 7123,
+    "avg_r_pooled": -0.1343,
+    "avg_r_day_bootstrap_ci95": [
+      -0.1639,
+      -0.1041
+    ]
   },
-  "run_utc": "2026-11-19T04:58:51.643683+00:00",
+  "run_utc": "2026-11-19T08:31:32.107271+00:00",
   "headline_optimistic_tiebreak": {
     "EURUSD": {
       "days": 719,
