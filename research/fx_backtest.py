@@ -71,7 +71,10 @@ def usd_per_quote_on(pair, d, series_cache):
         dd = d - datetime.timedelta(days=k)
         if dd in s:
             return s[dd]
-    return list(s.values())[-1]
+    # longer gap (e.g. year-end): use the most recent rate ON OR BEFORE d,
+    # never a future one
+    prior = [dd for dd in s if dd <= d]
+    return s[max(prior)] if prior else s[min(s)]
 
 def day_events(day_bars, open_min, or_bars):
     """Precompute opening range and first breakout events for a day.
