@@ -5,6 +5,7 @@ Independent validation of fxpulse, November 2026. Simulation only - no real orde
 - **DATA-CORRECTNESS.md** - are the free data feeds any good? Internal consistency screens plus a 710-day cross-check against official ECB reference rates. Short answer: yes for analysis, with documented limits.
 - **BACKTESTS.md** - does the shipped opening-range-breakout rule make money with explicit simulated capital ($10,000/pair, 1% risk, realistic spreads, all variants shown)? Short answer: no - gross it is a coin flip, net it loses reliably across 2.8 years and 10 pairs. The full grids, controls and stress tests are included, losing variants too.
 - `fetch_data.py`, `fx_validate.py`, `fx_backtest.py` - the exact code that produced every number (stdlib only).
+- **OPENSOURCE-LANDSCAPE.md** - survey of existing open-source backtesting engines, crypto bots and free data sources, and where an honesty-first toolkit fits; written to ground any multi-market extension decision.
 - `results/` - raw JSON outputs the docs were generated from.
 
 ## Reproduce
