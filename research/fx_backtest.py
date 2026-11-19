@@ -193,12 +193,16 @@ def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
             n_amb += amb
             risk_usd = equity * RISK_PCT / 100.0
             stop_pips = e_risk / pip
-            pv_unit = pip * usd_per_quote_on(pair, d, series_cache)  # USD per pip per unit
+            # conversion rates from strictly BEFORE the trade day: using the
+            # day's own last close would be a one-day lookahead (affects only
+            # sizing/conversion, not entries or exits, but keep it strict)
+            conv_day = d - datetime.timedelta(days=1)
+            pv_unit = pip * usd_per_quote_on(pair, conv_day, series_cache)  # USD per pip per unit
             if pv_unit > 0 and stop_pips > 0:
                 units = max(100, int(risk_usd / (stop_pips * pv_unit)) // 100 * 100)  # rounded DOWN
-                # P&L in quote currency -> USD at that day's conversion rate
+                # P&L in quote currency -> USD at the prior available conversion rate
                 pnl_quote = (e_exit - e_entry) * (1 if side == "buy" else -1) * units
-                pnl = pnl_quote * usd_per_quote_on(pair, d, series_cache)
+                pnl = pnl_quote * usd_per_quote_on(pair, conv_day, series_cache)
             else:
                 pnl = 0.0
             equity += pnl
@@ -346,6 +350,17 @@ def main():
         r = backtest_pair(pair, bars_by_pair[pair], iv, "follow", "or-mid", 1.0, 8, or_bars, 2.0, series_cache)
         stress[pair] = {k: v for k, v in r.items() if k != "trade_log"}
     results["stress_2x_spread"] = stress
+
+    # win-rate sweep: small targets win OFTEN and still lose money. Measured,
+    # scoped to this rule and sample - win rate alone is not profitability.
+    sweep = []
+    for tr in (0.1, 0.25, 0.5, 1.0, 2.0):
+        for pair in PAIRS:
+            r = backtest_pair(pair, bars_by_pair[pair], iv, "follow", "or-mid", tr, 8, or_bars,
+                              1.0, series_cache)
+            sweep.append({"pair": pair, "target_r": tr,
+                          **{k: v for k, v in r.items() if k not in ("trade_log",)}})
+    results["winrate_sweep"] = sweep
 
     # equal-weight portfolio of all 10 pairs (headline variant, net), $10k total
     port_curves = []

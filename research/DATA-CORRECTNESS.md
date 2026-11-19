@@ -76,6 +76,6 @@ NOT established: that every individual price is correct, that this feed matches 
 
 ## 5. Verdict
 
-- The Yahoo intraday feed the tools use is **internally consistent and unbiased against official central-bank reference rates** over ~2.8 years and 710 trading days per pair. It is fit for the descriptive, simulation-only analysis this project does.
+- The Yahoo intraday feed the tools use is **internally consistent, and unbiased at the daily ECB fixing - the one external point this test can check** over the sample above. It is fit for the descriptive, simulation-only analysis this project does. 'Unbiased' is scoped: it was measured at one time of day against one official source, not certified for every bar.
 - It is NOT an execution-grade feed: unofficial, no SLA, no Sunday session, occasional small gaps, and history limited to 60 days at 5-minute granularity. The project's own freshness labeling stays necessary.
 - ECB/Frankfurter reference rates are official and stable, but they are a few prints per day - they cannot replace intraday bars for session analysis, which is why the project treats them as the sizing/reference source only.

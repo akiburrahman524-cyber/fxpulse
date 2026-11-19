@@ -46,7 +46,7 @@ check("pip size EURUSD", fxdata.pip_size("EURUSD") == 0.0001)
 check("pip size USDJPY", fxdata.pip_size("USDJPY") == 0.01)
 check("to_pips", abs(fxdata.to_pips("EURUSD", 0.0015) - 15.0) < 1e-9)
 check("pip value USD-quote", fxdata.pip_value_usd("EURUSD") == 10.0)
-check("pip value USDJPY with price", abs(fxdata.pip_value_usd("USDJPY", price=150.0) - 10.0 / 150.0) < 1e-9)
+check("pip value USDJPY with price", abs(fxdata.pip_value_usd("USDJPY", price=150.0) - 1000.0 / 150.0) < 1e-9)
 
 # --- day splitting + opening range
 bars = synth_bars()

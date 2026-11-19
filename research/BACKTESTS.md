@@ -20,14 +20,14 @@ The first published version of this backtest (commits through 39f1c04) shifted t
 | --- | --- | --- | --- | --- | --- |
 | EURUSD | 49 | -0.2014 | -0.2110 | -9.58% | -10.03% |
 | GBPUSD | 49 | -0.1067 | -0.2047 | -5.28% | -9.77% |
-| USDJPY | 47 | +0.1266 | +0.0938 | 5.91% | 4.27% |
-| USDCHF | 47 | -0.1477 | -0.2518 | -6.86% | -11.36% |
+| USDJPY | 47 | +0.1266 | +0.0938 | 5.9% | 4.27% |
+| USDCHF | 47 | -0.1477 | -0.2518 | -6.87% | -11.36% |
 | USDCAD | 47 | -0.1668 | -0.3239 | -7.72% | -14.34% |
 | AUDUSD | 49 | -0.0446 | -0.2177 | -2.34% | -10.35% |
 | NZDUSD | 49 | -0.1329 | -0.2573 | -6.44% | -12.07% |
 | EURGBP | 49 | -0.1576 | -0.4063 | -7.58% | -18.27% |
 | EURJPY | 48 | +0.0530 | +0.0589 | 2.37% | 2.63% |
-| GBPJPY | 49 | -0.2537 | -0.3582 | -11.86% | -16.3% |
+| GBPJPY | 49 | -0.2537 | -0.3582 | -11.87% | -16.3% |
 
 1-hour sample, headline variant, legacy (favorable trigger shift) vs fixed (adverse fill cost):
 
@@ -35,14 +35,14 @@ The first published version of this backtest (commits through 39f1c04) shifted t
 | --- | --- | --- | --- | --- | --- |
 | EURUSD | 714 | -0.0416 | -0.0711 | -27.84% | -41.75% |
 | GBPUSD | 716 | -0.0858 | -0.1297 | -47.47% | -61.8% |
-| USDJPY | 711 | -0.0085 | -0.0299 | -8.73% | -21.83% |
-| USDCHF | 712 | -0.0468 | -0.0869 | -30.35% | -47.96% |
+| USDJPY | 711 | -0.0085 | -0.0299 | -8.71% | -21.82% |
+| USDCHF | 712 | -0.0468 | -0.0869 | -30.33% | -47.97% |
 | USDCAD | 719 | -0.1899 | -0.2452 | -75.17% | -83.41% |
 | AUDUSD | 713 | -0.1064 | -0.1633 | -54.43% | -69.81% |
 | NZDUSD | 721 | -0.1271 | -0.2353 | -60.95% | -82.29% |
-| EURGBP | 713 | -0.1539 | -0.2610 | -67.42% | -84.96% |
-| EURJPY | 696 | -0.0265 | -0.0497 | -19.12% | -31.45% |
-| GBPJPY | 708 | -0.0311 | -0.0658 | -22.01% | -39.23% |
+| EURGBP | 713 | -0.1539 | -0.2610 | -67.43% | -84.96% |
+| EURJPY | 696 | -0.0265 | -0.0497 | -19.14% | -31.46% |
+| GBPJPY | 708 | -0.0311 | -0.0658 | -21.99% | -39.26% |
 
 Read: in 19 of 20 pair-samples the legacy model reported a HIGHER average R than the truth - the favorable trigger shift flattered the rule it was supposed to stress. The error was found by re-reading the level arithmetic against the comment, not by a bad-looking number: the published conclusions still held, which is exactly why this class of bug survives. Regression coverage for the corrected convention (cost leaves hit counts unchanged, reduces avg R by exactly cost/R, for both sides) is in `test_fx.py`.
 
@@ -71,13 +71,13 @@ P&L by period (USD, net):
 | --- | --- | --- |
 | EURUSD | -828 | -175 |
 | GBPUSD | -111 | -866 |
-| USDJPY | +3 | +424 |
+| USDJPY | +2 | +424 |
 | USDCHF | -892 | -245 |
 | USDCAD | -779 | -655 |
 | AUDUSD | -426 | -609 |
 | NZDUSD | -666 | -541 |
-| EURGBP | -1156 | -671 |
-| EURJPY | -4 | +267 |
+| EURGBP | -1156 | -672 |
+| EURJPY | -5 | +267 |
 | GBPJPY | -791 | -839 |
 
 Gross vs net (cost drag), avg R per trade, same variant:
@@ -112,7 +112,7 @@ Random-direction control (coin flip between the buy-rule and the sell-rule each 
 
 Full grid on this sample: 180 net-cost variants with >=10 trades (direction x stop-rule x target-R across 10 pairs). **34 (19%) finished with positive total R. 1 had t > 2; with 180 variants, about 9 would pass that bar by pure luck.** The complete grid is in the JSON; the best-looking cells are exactly what multiple testing produces.
 
-Stress test (2x spread), same variant: EURUSD -13.2%, GBPUSD -14.2%, USDJPY +1.6%, USDCHF -16.7%, USDCAD -19.5%, AUDUSD -17.0%, NZDUSD -23.2%, EURGBP -27.7%, EURJPY -0.9%, GBPJPY -20.5%.
+Stress test (2x spread), same variant: EURUSD -13.2%, GBPUSD -14.2%, USDJPY +1.6%, USDCHF -16.7%, USDCAD -19.5%, AUDUSD -17.0%, NZDUSD -23.2%, EURGBP -27.7%, EURJPY -0.8%, GBPJPY -20.5%.
 
 ## Headline variant on 1-hour bars, 2024-02 to 2026-11 (~2.8 years)
 
@@ -122,16 +122,16 @@ Follow-the-breakout, stop or-mid, target 1R, 08:00 London, net costs. Each pair 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | EURUSD | 714 | 48.6 | -0.0711 | -41.75% | 52.06% | 0.86 | -1.97 |
 | GBPUSD | 716 | 46.9 | -0.1297 | -61.8% | 63.43% | 0.76 | -3.56 |
-| USDJPY | 711 | 50.4 | -0.0299 | -21.83% | 42.91% | 0.94 | -0.82 |
-| USDCHF | 712 | 50.0 | -0.0869 | -47.96% | 50.34% | 0.83 | -2.37 |
-| USDCAD | 719 | 42.0 | -0.2452 | -83.41% | 83.88% | 0.6 | -6.78 |
+| USDJPY | 711 | 50.4 | -0.0299 | -21.82% | 42.92% | 0.94 | -0.82 |
+| USDCHF | 712 | 50.0 | -0.0869 | -47.97% | 50.34% | 0.83 | -2.37 |
+| USDCAD | 719 | 42.0 | -0.2452 | -83.41% | 83.87% | 0.6 | -6.78 |
 | AUDUSD | 713 | 46.4 | -0.1633 | -69.81% | 71.48% | 0.71 | -4.5 |
 | NZDUSD | 721 | 47.2 | -0.2353 | -82.29% | 84.09% | 0.61 | -6.46 |
-| EURGBP | 713 | 43.8 | -0.261 | -84.96% | 85.18% | 0.57 | -7.24 |
-| EURJPY | 696 | 50.7 | -0.0497 | -31.45% | 38.71% | 0.9 | -1.37 |
-| GBPJPY | 708 | 49.7 | -0.0658 | -39.23% | 42.7% | 0.87 | -1.82 |
+| EURGBP | 713 | 43.8 | -0.261 | -84.96% | 85.19% | 0.57 | -7.24 |
+| EURJPY | 696 | 50.7 | -0.0497 | -31.46% | 38.72% | 0.9 | -1.37 |
+| GBPJPY | 708 | 49.7 | -0.0658 | -39.26% | 42.72% | 0.87 | -1.82 |
 
-Equal-weight 10-pair portfolio ($10,000 total): **return -56.45%, max drawdown 56.76%, 7123 trades**.
+Equal-weight 10-pair portfolio ($10,000 total): **return -56.45%, max drawdown 56.77%, 7123 trades**.
 
 P&L by period (USD, net):
 
@@ -139,14 +139,14 @@ P&L by period (USD, net):
 | --- | --- | --- | --- |
 | EURUSD | -2396 | -1857 | +77 |
 | GBPUSD | -1304 | -3806 | -1069 |
-| USDJPY | +1741 | +780 | -4704 |
-| USDCHF | -1285 | -1889 | -1622 |
-| USDCAD | -4753 | -2455 | -1134 |
+| USDJPY | +1743 | +780 | -4705 |
+| USDCHF | -1285 | -1890 | -1622 |
+| USDCAD | -4752 | -2455 | -1134 |
 | AUDUSD | -2360 | -3669 | -952 |
 | NZDUSD | -4708 | -2667 | -854 |
 | EURGBP | -4771 | -2284 | -1441 |
-| EURJPY | -1021 | +448 | -2572 |
-| GBPJPY | -1382 | -2282 | -259 |
+| EURJPY | -1021 | +448 | -2573 |
+| GBPJPY | -1385 | -2283 | -259 |
 
 Gross vs net (cost drag), avg R per trade, same variant:
 
@@ -207,14 +207,14 @@ When one bar's range touches BOTH the stop and the target, OHLC data cannot say 
 | --- | --- | --- | --- | --- |
 | EURUSD | 714 | 12 | -41.75% | -25.97% |
 | GBPUSD | 716 | 9 | -61.8% | -54.27% |
-| USDJPY | 711 | 24 | -21.83% | 26.37% |
-| USDCHF | 712 | 15 | -47.96% | -29.72% |
-| USDCAD | 719 | 35 | -83.41% | -66.59% |
+| USDJPY | 711 | 24 | -21.82% | 26.36% |
+| USDCHF | 712 | 15 | -47.97% | -29.75% |
+| USDCAD | 719 | 35 | -83.41% | -66.6% |
 | AUDUSD | 713 | 12 | -69.81% | -61.63% |
 | NZDUSD | 721 | 11 | -82.29% | -77.93% |
 | EURGBP | 713 | 16 | -84.96% | -79.29% |
-| EURJPY | 696 | 17 | -31.45% | -3.69% |
-| GBPJPY | 708 | 17 | -39.23% | -14.63% |
+| EURJPY | 696 | 17 | -31.46% | -3.68% |
+| GBPJPY | 708 | 17 | -39.26% | -14.62% |
 
 Read: on 5-minute bars the ambiguity is negligible (1 of 483 trades) - the conservative convention costs almost nothing. On hourly bars 168 of 7123 trades (2.4%) contain an ambiguous bar, and the bound is wide for some pairs. The truth sits between the two columns; even at the unreachable upper bound, 9 of 10 pairs still lose over the sample, and the no-edge conclusion stands under EITHER resolution. Whoever reruns this can pick their own convention - both are shipped.
 
@@ -237,6 +237,32 @@ If the rule had a real edge, nearby parameters would agree. They do not. Net avg
 
 EURUSD swings from -0.21R to +0.16R across those four neighbouring settings - the largest swing in the table. Sign flips from tiny parameter moves are what noise looks like.
 
+## Win rate is not profitability (measured)
+
+A small target is hit often. Does a 90%-win version of this rule make money? Measured, net of costs, same rule and samples as above (`winrate_sweep` in the results JSONs):
+
+5-minute sample - follow/or-mid, net costs, per target size (mean across the 10 pairs):
+
+| target | mean win % | mean avg R/trade | pairs with positive total R (of 10) |
+| --- | --- | --- | --- |
+| 0.10R | 38.0 | -0.1943 | 0 |
+| 0.25R | 66.6 | -0.2152 | 1 |
+| 0.50R | 64.0 | -0.1632 | 2 |
+| 1.00R | 46.2 | -0.2078 | 2 |
+| 2.00R | 32.5 | -0.1883 | 3 |
+
+1-hour sample - follow/or-mid, net costs, per target size (mean across the 10 pairs):
+
+| target | mean win % | mean avg R/trade | pairs with positive total R (of 10) |
+| --- | --- | --- | --- |
+| 0.10R | 52.8 | -0.2290 | 0 |
+| 0.25R | 69.3 | -0.1875 | 0 |
+| 0.50R | 61.5 | -0.1553 | 0 |
+| 1.00R | 47.6 | -0.1338 | 0 |
+| 2.00R | 35.5 | -0.1344 | 0 |
+
+Read: shrinking the target raises the win rate only up to a point - the best measured mean win rate is 69% (0.25R targets, 1-hour sample) - because the spread eats targets that small. 92% of the 100 pair/target cells above average NEGATIVE R per trade after costs. A 90% win rate was never observed in these tests, and even a variant that won nine trades in ten would not be safe: ten 0.1R wins are erased by one -1R loss plus costs. Expectancy, not win rate, decides whether an account grows. Scoped to this rule, these samples and these cost assumptions - not a statement about every possible strategy.
+
 ## Cross-checks of the shipped code
 
 - An independent re-implementation of the rule reproduces the repo's own `history_replay` outcome counts EXACTLY on identical data (EURUSD, 49 pool days: buy 13 target / 20 stop / 1 neither; sell 22 / 16 / 3). The shipped code computes what its README says it computes, including its no-same-day-lookahead claim.
@@ -246,9 +272,9 @@ EURUSD swings from -0.21R to +0.16R across those four neighbouring settings - th
 ## Conclusions
 
 1. **Data: fit for purpose.** Internally consistent, unbiased vs official ECB reference rates, with documented coverage limits.
-2. **The shipped strategy has no positive expectancy after realistic costs in any meaningful test.** Before costs it is a coin flip (long-sample gross expectancy ~0.0R); after a retail spread it loses reliably and consistently across 2024, 2025 and 2026. A $10,000 account trading it mechanically on the 10 tested pairs would have lost roughly 10% in the last 60 trading days at 5-minute granularity and roughly 56% over 2.8 years at hourly granularity, with drawdowns to match (conservative tie-break; even the unreachable optimistic bound leaves most pairs negative - see the ambiguity section).
+2. **The shipped strategy has no positive expectancy after realistic costs in any of the tests above.** Before costs it is a coin flip (long-sample gross expectancy ~0.0R); after a retail spread it loses reliably and consistently across 2024, 2025 and 2026. A $10,000 account trading it mechanically on the 10 tested pairs would have lost roughly 10% in the last 60 trading days at 5-minute granularity and roughly 56% over 2.8 years at hourly granularity, with drawdowns to match (conservative tie-break; even the unreachable optimistic bound leaves most pairs negative - see the ambiguity section).
 3. **Following the breakout beats a coin flip by nothing.** The random-direction control performs the same.
-4. **No parameter set rescued it.** 360 net-cost variants per timeframe; the few positive cells are fewer than chance produces, and neighbouring parameters flip sign.
+4. **No parameter set in the tested grid rescued it.** 360 net-cost variants per timeframe; the few positive cells are fewer than chance produces, and neighbouring parameters flip sign. That is evidence about the tested grid on these samples, not proof that no profitable rule of any kind could exist.
 5. These are simulations with optimistic fills (no slippage/gaps). Live results would be worse, not better.
 6. What the project IS good for, today: an honest, free, open toolkit for session analysis, plan arithmetic, risk sizing and Monte Carlo replay whose numbers say what they are. That has value precisely because it does not pretend an edge exists.
 

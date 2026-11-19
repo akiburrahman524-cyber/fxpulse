@@ -202,13 +202,15 @@ def usd_per_unit(currency, config=None):
 def pip_value_usd(pair, price=None, config=None):
     """USD value of one pip for one standard lot (100,000 units of base).
 
-    A pip is worth 10 units of the quote currency per standard lot.
-    Convert quote currency to USD with Frankfurter reference rates.
+    A pip is worth pip_size x 100,000 units of the quote currency per
+    standard lot: 10 for 4-decimal pairs (0.0001 x 100k), 1000 for JPY
+    pairs (0.01 x 100k). Convert quote currency to USD with Frankfurter
+    reference rates.
     `price` (current pair price) is used for USD-base pairs when given;
     otherwise reference rates are used.
     """
     base, quote = pair[:3], pair[3:]
-    pip_quote = 10.0  # quote-currency units per pip per standard lot
+    pip_quote = pip_size(pair) * 100000.0  # quote-currency units per pip per standard lot
     if quote == "USD":
         return pip_quote
     if base == "USD":

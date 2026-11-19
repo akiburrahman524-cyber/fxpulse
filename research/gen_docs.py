@@ -88,8 +88,9 @@ L.append("NOT established: that every individual price is correct, that this fee
          "(whose two legs share the same ECB fixing) shows the smallest deviations - but it was not verified against a second "
          "intraday source. These checks argue the feed is fit for descriptive analysis; they are not a blanket certification.\n")
 L.append("## 5. Verdict\n")
-L.append("- The Yahoo intraday feed the tools use is **internally consistent and unbiased against official central-bank reference rates** "
-         "over ~2.8 years and 710 trading days per pair. It is fit for the descriptive, simulation-only analysis this project does.")
+L.append("- The Yahoo intraday feed the tools use is **internally consistent, and unbiased at the daily ECB fixing - the one external "
+         "point this test can check** over the sample above. It is fit for the descriptive, simulation-only analysis this project does. "
+         "'Unbiased' is scoped: it was measured at one time of day against one official source, not certified for every bar.")
 L.append("- It is NOT an execution-grade feed: unofficial, no SLA, no Sunday session, occasional small gaps, and history limited to "
          "60 days at 5-minute granularity. The project's own freshness labeling stays necessary.")
 L.append("- ECB/Frankfurter reference rates are official and stable, but they are a few prints per day - they cannot replace intraday bars "
@@ -275,6 +276,36 @@ if worst:
              "Sign flips from tiny parameter moves are what noise looks like.\n" % (worst[1], worst[2], worst[3]))
 else:
     L.append("Sign flips from tiny parameter moves are what noise looks like.\n")
+L.append("## Win rate is not profitability (measured)\n")
+L.append("A small target is hit often. Does a 90%-win version of this rule make money? Measured, net of costs, same rule and "
+         "samples as above (`winrate_sweep` in the results JSONs):\n")
+for label, B in (("5-minute sample", B5), ("1-hour sample", B1)):
+    L.append("%s - follow/or-mid, net costs, per target size (mean across the 10 pairs):" % label)
+    L.append("")
+    L.append("| target | mean win % | mean avg R/trade | pairs with positive total R (of 10) |")
+    L.append("| --- | --- | --- | --- |")
+    for tr in (0.1, 0.25, 0.5, 1.0, 2.0):
+        rows = [s for s in B["winrate_sweep"] if s["target_r"] == tr]
+        wr = [s["win_rate"] for s in rows if s["win_rate"] is not None]
+        ar = [s["avg_r"] for s in rows if s["avg_r"] is not None]
+        posr = sum(1 for s in rows if s["total_r"] > 0)
+        L.append("| %.2fR | %.1f | %+.4f | %d |" % (tr, sum(wr)/len(wr), sum(ar)/len(ar), posr))
+    L.append("")
+best_wr, best_tr, best_iv = 0.0, None, None
+for iv, B in (("5-minute", B5), ("1-hour", B1)):
+    for tr in (0.1, 0.25, 0.5, 1.0, 2.0):
+        rows = [s for s in B["winrate_sweep"] if s["target_r"] == tr]
+        wr = [s["win_rate"] for s in rows if s["win_rate"] is not None]
+        if wr and sum(wr)/len(wr) > best_wr:
+            best_wr, best_tr, best_iv = sum(wr)/len(wr), tr, iv
+all_avg = [s["avg_r"] for B in (B5, B1) for s in B["winrate_sweep"] if s["avg_r"] is not None]
+neg_share = 100.0 * sum(1 for a in all_avg if a < 0) / len(all_avg)
+L.append("Read: shrinking the target raises the win rate only up to a point - the best measured mean win rate is %.0f%% "
+         "(%.2fR targets, %s sample) - because the spread eats targets that small. %.0f%% of the 100 pair/target cells above "
+         "average NEGATIVE R per trade after costs. A 90%% win rate was never observed in these tests, and even a variant that "
+         "won nine trades in ten would not be safe: ten 0.1R wins are erased by one -1R loss plus costs. Expectancy, not win "
+         "rate, decides whether an account grows. Scoped to this rule, these samples and these cost assumptions - not a "
+         "statement about every possible strategy.\n" % (best_wr, best_tr, best_iv, neg_share))
 L.append("## Cross-checks of the shipped code\n")
 L.append("- An independent re-implementation of the rule reproduces the repo's own `history_replay` outcome counts EXACTLY on identical data "
          "(EURUSD, 49 pool days: buy 13 target / 20 stop / 1 neither; sell 22 / 16 / 3). The shipped code computes what its README says it computes, "
@@ -285,15 +316,16 @@ L.append("- `fx_timemachine.py run` end-to-end on a live plan (EURUSD buy, 1R, 2
          "correctly as in-sample descriptive statistics, and its walk-forward section honestly states the sample is too small to validate an edge.\n")
 L.append("## Conclusions\n")
 L.append("1. **Data: fit for purpose.** Internally consistent, unbiased vs official ECB reference rates, with documented coverage limits.")
-L.append("2. **The shipped strategy has no positive expectancy after realistic costs in any meaningful test.** Before costs it is a coin flip "
+L.append("2. **The shipped strategy has no positive expectancy after realistic costs in any of the tests above.** Before costs it is a coin flip "
          "(long-sample gross expectancy ~0.0R); after a retail spread it loses reliably and consistently across 2024, 2025 and 2026. "
          "A $10,000 account trading it mechanically on the 10 tested pairs would have lost roughly %.0f%% in the last 60 trading days at "
          "5-minute granularity and roughly %.0f%% over 2.8 years at hourly granularity, with drawdowns to match "
          "(conservative tie-break; even the unreachable optimistic bound leaves most pairs negative - see the ambiguity section)." % (
     -B5["portfolio"]["return_pct"], -B1["portfolio"]["return_pct"]))
 L.append("3. **Following the breakout beats a coin flip by nothing.** The random-direction control performs the same.")
-L.append("4. **No parameter set rescued it.** 360 net-cost variants per timeframe; the few positive cells are fewer than chance produces, "
-         "and neighbouring parameters flip sign.")
+L.append("4. **No parameter set in the tested grid rescued it.** 360 net-cost variants per timeframe; the few positive cells are "
+         "fewer than chance produces, and neighbouring parameters flip sign. That is evidence about the tested grid on these "
+         "samples, not proof that no profitable rule of any kind could exist.")
 L.append("5. These are simulations with optimistic fills (no slippage/gaps). Live results would be worse, not better.")
 L.append("6. What the project IS good for, today: an honest, free, open toolkit for session analysis, plan arithmetic, risk sizing and "
          "Monte Carlo replay whose numbers say what they are. That has value precisely because it does not pretend an edge exists.\n")
