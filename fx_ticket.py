@@ -82,7 +82,7 @@ def main(argv=None):
         with open(JOURNAL_PATH) as f:
             entries = json.load(f)
     entries.append({
-        "time_utc": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
+        "time_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
         "pair": plan["pair"], "side": plan["side"],
         "entry": plan["entry"], "stop": plan["stop"], "target": plan["target"],
         "lots": a.lots, "outcome": None, "simulation": True,

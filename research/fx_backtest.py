@@ -9,9 +9,18 @@ so the shipped code paths are the ones under test.
 
 Simulated capital: USD 10,000 per pair, risk 1% of current equity per trade,
 position size from stop distance and pip value, rounded to 100 units.
-Costs: per-pair retail-typical spread applied adversely at entry AND exit
-(half-spread each side, same convention as the repo). Scenarios: gross (0x),
-net (1x), stress (2x). Slippage and gaps NOT modeled: real results are worse.
+Costs: per-pair retail-typical spread charged as an adverse FILL cost at
+entry AND exit (half a spread worse than mid on every fill), R measured
+against the intended stop distance; trigger levels stay at the mid-bar
+levels. Scenarios: gross (0x), net (1x), stress (2x). Slippage and gaps NOT
+modeled: real results are worse.
+
+cost_model="fill" is the corrected convention (2026-11-19). The earlier code
+("legacy-shift") moved the stop and target trigger levels half a spread in
+the FAVORABLE direction - stop further away, target nearer - while its
+comment claimed adverse; see research/cost_model_check.py for the measured
+effect. legacy-shift is kept only so that check can reproduce the old
+numbers.
 
 Simulation only. Not financial advice. No real orders are possible here.
 """
@@ -29,11 +38,11 @@ START_EQUITY = 10000.0
 RISK_PCT = 1.0
 
 def utc_minutes(ts):
-    d = datetime.datetime.utcfromtimestamp(ts)
+    d = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
     return d.hour*60 + d.minute
 
 def utc_date(ts):
-    return datetime.datetime.utcfromtimestamp(ts).date()
+    return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).date()
 
 def load_bars(pair, iv):
     with open(os.path.join(DATA, "%s-%s.json" % (pair, iv))) as f:
@@ -87,8 +96,16 @@ def day_events(day_bars, open_min, or_bars):
             break
     return ev
 
-def run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng=None, tie="stop"):
-    """Simulate one ORB trade. Returns (side, entry, exit, r_multiple) or None."""
+def run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng=None, tie="stop", cost_model="fill"):
+    """Simulate one ORB trade. Returns (side, entry, exit, r_multiple, risk, ambiguous) or None.
+
+    cost_model="fill" (correct): entry fills half a spread worse than mid
+    (buy pays ask, sell receives bid); triggers stay at the mid-bar stop and
+    target levels; every exit fills half a spread worse than the level; R is
+    measured against the intended stop distance.
+    cost_model="legacy-shift" (pre-fix, kept only for cost_model_check.py):
+    trigger levels shifted half a spread FAVORABLY (stop further, target
+    nearer) and R measured against the widened distance."""
     if direction == "follow":
         if not ev["any"]:
             return None
@@ -115,29 +132,34 @@ def run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng=Non
         return None
     target = entry + target_r * risk if side == "buy" else entry - target_r * risk
     adv = half_spread if side == "buy" else -half_spread
-    e_entry = entry + adv
-    e_stop = stop - adv
-    e_target = target - adv
-    e_risk = abs(e_entry - e_stop)
+    e_entry = entry + adv  # buy pays ask, sell receives bid
+    if cost_model == "legacy-shift":
+        trig_stop, trig_target = stop - adv, target - adv  # FAVORABLE shift (the bug)
+        fill_stop, fill_target = trig_stop, trig_target
+        e_risk = abs(e_entry - trig_stop)
+    else:
+        trig_stop, trig_target = stop, target              # triggers at the mid-bar levels
+        fill_stop, fill_target = stop - adv, target - adv  # exits fill half a spread worse
+        e_risk = risk
     exit_price = None
     ambiguous = 0
     for b in day_bars[idx + 1:]:
         if side == "buy":
-            hs = b["low"] <= e_stop
-            ht = b["high"] >= e_target
+            hs = b["low"] <= trig_stop
+            ht = b["high"] >= trig_target
         else:
-            hs = b["high"] >= e_stop
-            ht = b["low"] <= e_target
+            hs = b["high"] >= trig_stop
+            ht = b["low"] <= trig_target
         if hs and ht:
             ambiguous += 1
             # bar touched BOTH levels: intrabar order unknowable from OHLC.
             # tie="stop" is conservative, tie="target" optimistic; report both.
-            exit_price = e_stop if tie == "stop" else e_target
+            exit_price = fill_stop if tie == "stop" else fill_target
             break
         if hs:
-            exit_price = e_stop; break
+            exit_price = fill_stop; break
         if ht:
-            exit_price = e_target; break
+            exit_price = fill_target; break
     if exit_price is None:  # day-end exit at last close, adverse half-spread
         last = day_bars[-1]["close"]
         exit_price = last - adv
@@ -145,7 +167,8 @@ def run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng=Non
     return side, e_entry, exit_price, r_mult, e_risk, ambiguous
 
 def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
-                  or_bars, spread_mult, series_cache, rng=None, trade_log=False, tie="stop"):
+                  or_bars, spread_mult, series_cache, rng=None, trade_log=False, tie="stop",
+                  cost_model="fill"):
     pip = fxdata.pip_size(pair)
     half_spread = SPREAD_PIPS[pair] * spread_mult * pip / 2.0
     days = fx_scan.split_days(bars)
@@ -161,7 +184,7 @@ def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
         n_days += 1
         open_min = fxdata.session_open_utc_minutes(d) + (session_hour - 8) * 60
         ev = day_events(day_bars, open_min, or_bars)
-        res = run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng, tie=tie) if ev else None
+        res = run_trade(day_bars, ev, direction, stop_rule, target_r, half_spread, rng, tie=tie, cost_model=cost_model) if ev else None
         if res:
             side, e_entry, e_exit, r_mult, e_risk, amb = res
             n_amb += amb
@@ -169,7 +192,7 @@ def backtest_pair(pair, bars, iv, direction, stop_rule, target_r, session_hour,
             stop_pips = e_risk / pip
             pv_unit = pip * usd_per_quote_on(pair, d, series_cache)  # USD per pip per unit
             if pv_unit > 0 and stop_pips > 0:
-                units = max(100, int(round(risk_usd / (stop_pips * pv_unit), -2)))
+                units = max(100, int(risk_usd / (stop_pips * pv_unit)) // 100 * 100)  # rounded DOWN
                 # P&L in quote currency -> USD at that day's conversion rate
                 pnl_quote = (e_exit - e_entry) * (1 if side == "buy" else -1) * units
                 pnl = pnl_quote * usd_per_quote_on(pair, d, series_cache)
@@ -260,7 +283,7 @@ def main():
     results = {"timeframe": iv, "start_equity": START_EQUITY, "risk_pct": RISK_PCT,
                "spread_pips": SPREAD_PIPS, "grid": [], "headline": None,
                "random_control": None, "portfolio": None,
-               "run_utc": datetime.datetime.utcnow().isoformat()}
+               "run_utc": datetime.datetime.now(datetime.timezone.utc).isoformat()}
     or_bars = 12 if iv == "5m" else 1
 
     grid = []

@@ -12,7 +12,7 @@ def load(pair, iv):
         return json.load(f)
 
 def utc(ts):
-    return datetime.datetime.utcfromtimestamp(ts)
+    return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
 
 def internal_checks(pair, iv, bars):
     r = {"pair": pair, "interval": iv, "bars": len(bars),
@@ -149,7 +149,7 @@ def cross_source_checks(pair, bars_1h, ecb):
 
 def main():
     print("=== fxpulse data correctness report ===")
-    print("run at %s UTC" % datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M"))
+    print("run at %s UTC" % datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M"))
     internal = []
     for p in PAIRS:
         for iv in ("5m", "1h"):
@@ -158,7 +158,7 @@ def main():
     end = max(r["last"][:10] for r in internal)
     ecb = frankfurter_history(start, end)
     cross = [cross_source_checks(p, load(p, "1h"), ecb) for p in PAIRS]
-    out = {"run_utc": datetime.datetime.utcnow().isoformat(), "internal": internal, "ecb_cross": cross, "ecb_method": "Yahoo hourly bar OPEN at ECB fixing instant (16:00 CET/CEST, DST-aware) vs Frankfurter/ECB daily reference rate"}
+    out = {"run_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "internal": internal, "ecb_cross": cross, "ecb_method": "Yahoo hourly bar OPEN at ECB fixing instant (16:00 CET/CEST, DST-aware) vs Frankfurter/ECB daily reference rate"}
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "results", "validate_results.json"), "w") as f:
         json.dump(out, f, indent=2)
     for r in internal:

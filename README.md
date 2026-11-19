@@ -35,7 +35,7 @@ The Time Machine resamples the pair's last ~60 days of 5-minute bars. Its percen
 - The history re-run uses only each day's OWN bars, and the opening range is fully formed before the entry is taken: no lookahead.
 - Sessions are defined in Europe/London local time (default 08:00 London) and converted to UTC per date with DST rules; a fixed-UTC override exists. "London open" means the strategy's 08:00 London-local anchor, not an exchange bell (forex has none).
 - Bar resampling weakens serial dependence. `--block N` draws consecutive bars from one past day to preserve short-range dependence; compare block 1 vs block 6 before reading anything into the numbers.
-- Costs: a configurable spread (default 1 pip) shifts ALL levels adversely. Slippage, fees, and gaps are NOT modeled; a gap through the stop counts -1R in the sim while a real fill can be worse. Real results are worse than the sim.
+- Costs: a configurable spread (default 1 pip) is charged as an adverse fill cost on every replay - entry and exit fills are each half a spread worse than mid, deducted from that replay's R. It changes what outcomes pay, not which level is touched first (bid/ask trigger displacement is a second-order effect, not modeled). Slippage, fees, and gaps are NOT modeled; a gap through the stop counts -1R-cost in the sim while a real fill can be worse. Real results are worse than the sim.
 - Data freshness is printed with every run (age of the newest bar, pool window dates). The intraday feed is an unofficial endpoint with no SLA; if it lags or dies, the tool says so rather than silently analyzing stale candles.
 
 No output of this project is a recommendation to trade, and past resampled behavior does not guarantee anything.
@@ -61,7 +61,7 @@ Activation: intraday features need one-time local personal-use activation (`pyth
 
 Does the data hold up, and does the shipped session-breakout rule actually make money? Tested in simulation only, with explicit simulated capital (USD 10,000 per pair, 1% risk per trade, realistic retail spreads), across 10 pairs on 60 days of 5-minute bars and ~2.8 years of hourly bars, with the full parameter grid, random-direction controls, cost stress tests and intrabar-ambiguity bounds - losing variants included, nothing removed.
 
-- [research/DATA-CORRECTNESS.md](research/DATA-CORRECTNESS.md): the free feeds are internally consistent and unbiased vs official ECB reference rates (710 days/pair), with documented coverage limits.
+- [research/DATA-CORRECTNESS.md](research/DATA-CORRECTNESS.md): the free feeds are internally consistent and unbiased vs official ECB reference rates (~2.8 years of daily prints per pair), with documented coverage limits.
 - [research/BACKTESTS.md](research/BACKTESTS.md): the rule has no positive expectancy after realistic costs in any meaningful test - before costs it is a coin flip, after costs it loses reliably across 2024-2026. The toolkit's value is honest analysis, not a promised edge. Nothing there is financial advice.
 
 ## License

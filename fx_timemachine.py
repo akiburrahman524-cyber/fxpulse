@@ -22,6 +22,9 @@ Method (stated so anyone can check it):
      stop is checked before the target within a bar (conservative).
   4. Outcomes: target / stop (first touch) or neither at --until. R = +targetR
      at the target, -1 at the stop, else (exit-entry)/risk with sign by side.
+     The spread is then charged once per replay as an adverse fill cost in R
+     (entry and exit each half a spread worse than mid); trigger levels are
+     not moved.
   5. Verdict: among replays that hit a side, compare target share with the
      break-even share 1/(1+R). <5 points gap = close to break-even, 5-15 =
      leans, 15+ = strongly. Same plan, same data, same seed = same numbers.
@@ -53,7 +56,7 @@ MIN_DAY_BARS = 270
 
 
 def utc_minutes(ts):
-    d = datetime.datetime.utcfromtimestamp(ts)
+    d = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
     return d.hour * 60 + d.minute
 
 
@@ -94,7 +97,11 @@ def build_pool(sessions):
     return pool, series
 
 
-def simulate(pool, entry, stop, target, start_slot, end_slot, replays, seed, window, side, block=1, series=None):
+def simulate(pool, entry, stop, target, start_slot, end_slot, replays, seed, window, side, block=1, series=None, cost_r=0.0):
+    """cost_r: adverse round-trip cost in R units (spread / intended risk),
+    subtracted once from every replay's R: entry and exit fills are each half
+    a spread worse than mid. Trigger levels are NOT moved - bid/ask trigger
+    displacement is a second-order effect and is not modeled."""
     rng = random.Random(seed)
     max_slot = max(pool)
     start_slot = max(1, min(start_slot, max_slot))
@@ -130,24 +137,25 @@ def simulate(pool, entry, stop, target, start_slot, end_slot, replays, seed, win
             hit_target = (hi >= target) if long else (lo <= target)
             if hit_stop:  # stop first, conservative
                 outcome = "stop"
-                r_sum += -1.0
+                r_sum += -1.0 - cost_r
                 price = stop
                 break
             if hit_target:
                 outcome = "target"
-                r_sum += abs(target - entry) / risk
+                r_sum += abs(target - entry) / risk - cost_r
                 price = target
                 break
             price = price * c
         counts[outcome] += 1
         if outcome == "neither":
             r = ((price - entry) if long else (entry - price)) / risk
-            r_sum += r
+            r_sum += r - cost_r
         finals.append(price)
     finals.sort()
     n = len(finals)
     return {
         "replays": replays, "seed": seed, "window": window, "block": block,
+        "cost_r_per_trade": cost_r,
         "counts": counts,
         "avg_r": r_sum / replays,
         "median_final": finals[n // 2],
@@ -191,20 +199,20 @@ def history_replay(sessions, pair, side, or_bars, session_open_min, target_r, lo
         mid = (hi + lo) / 2.0
         formed_after = open_min + or_bars * 5
         entry = None
-        for b in day:
+        for idx, b in enumerate(day):
             if utc_minutes(b["ts"]) < formed_after:
                 continue
             if side == "buy" and b["close"] > hi:
                 entry = b["close"]
                 stop = mid
                 target = entry + target_r * (entry - stop)
-                rest = day[day.index(b) + 1:]
+                rest = day[idx + 1:]
                 break
             if side == "sell" and b["close"] < lo:
                 entry = b["close"]
                 stop = mid
                 target = entry - target_r * (stop - entry)
-                rest = day[day.index(b) + 1:]
+                rest = day[idx + 1:]
                 break
         if entry is None:
             continue
@@ -226,7 +234,7 @@ def history_replay(sessions, pair, side, or_bars, session_open_min, target_r, lo
 
 
 def walk_forward(all_sessions, pair, side, or_bars, target_r, n_days, replays, seed,
-                 start_slot, end_slot, window, block):
+                 start_slot, end_slot, window, block, cost_r=0.0):
     """Genuine out-of-sample evaluation: for each of the last n_days full days
     D, the pool is rebuilt from days strictly before D only; the rule is then
     evaluated on D's own untouched bars (range formed before entry). The MC
@@ -273,7 +281,7 @@ def walk_forward(all_sessions, pair, side, or_bars, target_r, n_days, replays, s
                         if b["low"] <= target:
                             outcome = "target"; break
                 sim = simulate(pool, entry, stop, target, start_slot, end_slot,
-                               replays, seed, window, side, block=block, series=series)
+                               replays, seed, window, side, block=block, series=series, cost_r=cost_r)
                 t, s = sim["counts"]["target"], sim["counts"]["stop"]
                 row["sim_target_share_pct"] = round(100.0 * t / (t + s), 1) if (t + s) else None
                 row["actual"] = outcome
@@ -308,7 +316,7 @@ def main(argv=None):
     p.add_argument("--block", type=int, default=1,
                    help="resample blocks of N consecutive bars from one past day (default 1 = independent bars). Blocks preserve short-range serial dependence.")
     p.add_argument("--spread-pips", type=float, default=1.0,
-                   help="assumed spread, applied adversely to the entry (default 1 pip). Slippage and fees are NOT modeled and make real results worse.")
+                   help="assumed spread, charged as an adverse fill cost on entry AND exit (default 1 pip): each replay's R is reduced by spread/stop-distance. It changes what outcomes pay, not which level is touched first. Slippage and fees are NOT modeled and make real results worse.")
     p.add_argument("--write", action="store_true")
     p.add_argument("--json", action="store_true")
     a = p.parse_args(argv)
@@ -342,7 +350,7 @@ def main(argv=None):
     else:
         # no plan day given: exclude today's UTC date explicitly - a bar-count
         # threshold alone cannot guarantee a late-day partial day stays out
-        before = datetime.datetime.utcfromtimestamp(bars[-1]["ts"]).date()
+        before = datetime.datetime.fromtimestamp(bars[-1]["ts"], datetime.timezone.utc).date()
     sessions = full_days(bars, before, exclude_last=a.holdout)
     if len(sessions) < a.min_days:
         sys.exit("only %d full days of bars in the pool (need %d); refusing to simulate on too little data"
@@ -352,29 +360,28 @@ def main(argv=None):
     start_slot = slot_of_time(a.entry_time)
     end_slot = slot_of_time(a.until)
 
-    # spread: ALL levels shifted adversely by half the spread (mid-price
-    # bars): a buy enters at ask and exits at bid, a sell the reverse. The
-    # stop becomes easier to hit and the target harder, for both sides.
-    half_spread = fxdata.from_pips(pair, a.spread_pips) / 2.0
-    adverse = half_spread if side == "buy" else -half_spread
-    eff_entry = entry + adverse
-    eff_stop = stop - adverse
-    eff_target = target - adverse
+    # Costs: the spread is an adverse FILL cost, not a shift of the trigger
+    # levels. A buy pays the ask (half a spread worse than mid) at entry and
+    # receives the bid (half a spread worse) at every exit; a sell the
+    # reverse. Charged in R against the intended stop distance, so every
+    # replay pays cost_r = spread / risk exactly once per round trip. Which
+    # level is touched first does not change (bid/ask trigger displacement
+    # is a second-order effect and is not modeled).
+    cost_r = fxdata.from_pips(pair, a.spread_pips) / risk
 
-    sim = simulate(pool, eff_entry, eff_stop, eff_target, start_slot, end_slot,
-                   a.replays, a.seed, a.window, side, block=a.block, series=series)
+    sim = simulate(pool, entry, stop, target, start_slot, end_slot,
+                   a.replays, a.seed, a.window, side, block=a.block, series=series, cost_r=cost_r)
     hist = history_replay(sessions, pair, side, a.or_bars, 8 * 60, target_r, london_session=True)
     wf = []
     if a.walkforward:
         all_sessions = full_days(bars, before, exclude_last=0)
         wf = walk_forward(all_sessions, pair, side, a.or_bars, target_r, a.walkforward,
-                          min(a.replays, 2000), a.seed, start_slot, end_slot, a.window, a.block)
+                          min(a.replays, 2000), a.seed, start_slot, end_slot, a.window, a.block,
+                          cost_r=cost_r)
     result = {
         "pair": pair, "side": side, "entry": entry, "stop": stop, "target": target,
-        "effective_entry_with_spread": round(eff_entry, 6),
-        "effective_stop_with_spread": round(eff_stop, 6),
-        "effective_target_with_spread": round(eff_target, 6),
         "spread_pips": a.spread_pips,
+        "cost_r_per_trade": round(cost_r, 4),
         "target_r": round(target_r, 2), "sessions": len(sessions),
         "pool_window": pool_window, "holdout_days_excluded": a.holdout,
         "data_age_min": round(age / 60.0, 1) if age is not None else None,
@@ -384,7 +391,9 @@ def main(argv=None):
         "caveat": ("IN-SAMPLE resampling of this pool's recent bars: descriptive statistics about the recent past, "
                    "NOT calibrated probabilities and NOT evidence of predictive edge. Bar resampling "
                    "weakens serial dependence (use --block to preserve some). Stop-first within each bar is "
-                   "conservative; gaps, slippage and fees are not modeled and make real results worse. "
+                   "conservative. The spread is charged as an adverse fill cost on every replay's R; it does "
+                   "not change which level is touched first. Gaps, slippage and fees are not modeled and make "
+                   "real results worse. "
                    "The history re-run uses only each day's own bars (range formed before entry: no same-day "
                    "lookahead). Simulation only, not financial advice."),
     }
@@ -396,8 +405,8 @@ def main(argv=None):
         print(json.dumps(result, indent=2))
         return 0
     c = sim["counts"]
-    print("%s %s  entry %.5f stop %.5f target %.5f (%.2fR); with %.1f-pip spread all levels shift adversely to %.5f / %.5f / %.5f"
-          % (pair, side.upper(), entry, stop, target, target_r, a.spread_pips, eff_entry, eff_stop, eff_target))
+    print("%s %s  entry %.5f stop %.5f target %.5f (%.2fR); %.1f-pip spread = %.3fR adverse cost per trade (fills worse, trigger levels unchanged)"
+          % (pair, side.upper(), entry, stop, target, target_r, a.spread_pips, cost_r))
     print("  pool: %d full days, %s%s, bars age %.1f min"
           % (len(sessions), pool_window,
              (" (holdout: last %d excluded)" % a.holdout) if a.holdout else "", age / 60.0 if age else -1))

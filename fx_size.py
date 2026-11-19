@@ -30,7 +30,9 @@ def size_position(pair, stop_pips, balance, risk_amount=None, risk_pct=None, pri
         raise RuntimeError("stop must be a positive number of pips")
     pv = fxdata.pip_value_usd(pair, price=price)
     lots = risk_amount / (stop_pips * pv)
-    units = int(round(lots * 100000, -2))  # round to 100 units (common broker step)
+    # round DOWN to 100-unit steps (common broker step): rounding up would
+    # risk more than the stated amount
+    units = int(lots * 100000) // 100 * 100
     return {
         "pair": pair,
         "balance_usd": balance,
@@ -40,6 +42,7 @@ def size_position(pair, stop_pips, balance, risk_amount=None, risk_pct=None, pri
         "standard_lots": round(lots, 4),
         "units_approx": units,
         "max_loss_usd_at_stop": round(stop_pips * pv * lots, 2),
+        "max_loss_usd_at_floored_units": round(stop_pips * pv * units / 100000.0, 2),
         "note": ("Sizing arithmetic with Frankfurter reference rates for pip values. "
                  "Brokers quote their own pip values and lot steps; check yours. "
                  "Simulation aid, not advice."),

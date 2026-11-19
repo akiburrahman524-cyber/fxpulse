@@ -3,12 +3,13 @@
 
 For each pair, fetches recent 5-minute bars (Yahoo chart endpoint, unofficial,
 personal use), takes the latest UTC day, builds the opening range from the
-first bars after the session open (default 07:00 UTC, the London open hour),
-and reports where the price sits against that range.
+first bars after the session open (default 08:00 Europe/London local, the
+London morning open, converted to UTC per date with DST rules), and reports
+where the price sits against that range.
 
     python3 fx_scan.py                      # all configured pairs
     python3 fx_scan.py --pairs EURUSD USDJPY GBPJPY
-    python3 fx_scan.py --session-open 7 --or-bars 12   # 07:00 UTC, first hour
+    python3 fx_scan.py --session-open 7 --or-bars 12   # 07:00 London local, first hour
     python3 fx_scan.py --json
 
 This is descriptive analysis of public data, not a recommendation to trade.
@@ -23,11 +24,11 @@ import fxdata
 
 
 def utc_day(ts):
-    return datetime.datetime.utcfromtimestamp(ts).date()
+    return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).date()
 
 
 def utc_minutes(ts):
-    d = datetime.datetime.utcfromtimestamp(ts)
+    d = datetime.datetime.fromtimestamp(ts, datetime.timezone.utc)
     return d.hour * 60 + d.minute
 
 
@@ -65,7 +66,7 @@ def scan_pair(pair, session_open_min, or_bars, per_day_session=False):
     out = {
         "pair": pair, "day": str(latest), "bars_today": len(day),
         "last": last["close"],
-        "last_bar_utc": datetime.datetime.utcfromtimestamp(last["ts"]).strftime("%H:%M"),
+        "last_bar_utc": datetime.datetime.fromtimestamp(last["ts"], datetime.timezone.utc).strftime("%H:%M"),
         "data_age_min": round(age / 60.0, 1) if age is not None else None,
         "session_open_utc": "%02d:%02d" % (open_min // 60, open_min % 60),
     }
@@ -87,12 +88,12 @@ def scan_pair(pair, session_open_min, or_bars, per_day_session=False):
                 continue
             if b["close"] > hi:
                 out["breakout"] = {"side": "up",
-                                   "at_utc": datetime.datetime.utcfromtimestamp(b["ts"]).strftime("%H:%M"),
+                                   "at_utc": datetime.datetime.fromtimestamp(b["ts"], datetime.timezone.utc).strftime("%H:%M"),
                                    "close": b["close"]}
                 break
             if b["close"] < lo:
                 out["breakout"] = {"side": "down",
-                                   "at_utc": datetime.datetime.utcfromtimestamp(b["ts"]).strftime("%H:%M"),
+                                   "at_utc": datetime.datetime.fromtimestamp(b["ts"], datetime.timezone.utc).strftime("%H:%M"),
                                    "close": b["close"]}
                 break
     else:

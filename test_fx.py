@@ -115,6 +115,21 @@ check("walkforward rows = 5", len(wf) == 5)
 check("walkforward pools shrink into past", all(r["pool_days"] < 25 for r in wf))
 check("walkforward outcomes valid", all((not r["fired"]) or r["actual"] in ("target", "stop", "neither") for r in wf))
 
+# --- cost model: adverse fill cost in R, trigger levels unchanged
+sc0 = fx_timemachine.simulate(pool, 1.1000, 1.0950, 1.1100, 100, 287, 500, 19, 2, "buy", series=series, cost_r=0.0)
+sc1 = fx_timemachine.simulate(pool, 1.1000, 1.0950, 1.1100, 100, 287, 500, 19, 2, "buy", series=series, cost_r=0.02)
+sc1s = fx_timemachine.simulate(pool, 1.1000, 1.0950, 1.1100, 100, 287, 500, 19, 2, "sell", series=series, cost_r=0.02)
+sc0s = fx_timemachine.simulate(pool, 1.1000, 1.0950, 1.1100, 100, 287, 500, 19, 2, "sell", series=series, cost_r=0.0)
+check("cost leaves hit counts unchanged", sc0["counts"] == sc1["counts"] and sc0s["counts"] == sc1s["counts"])
+check("cost reduces avg R by exactly cost_r (buy)", abs((sc0["avg_r"] - sc1["avg_r"]) - 0.02) < 1e-9)
+check("cost reduces avg R by exactly cost_r (sell)", abs((sc0s["avg_r"] - sc1s["avg_r"]) - 0.02) < 1e-9)
+check("cost is adverse", sc1["avg_r"] < sc0["avg_r"] and sc1s["avg_r"] < sc0s["avg_r"])
+
+# --- sizing: units rounded DOWN, never risk more than intended
+out2 = fx_size.size_position("EURUSD", 15.0, 5000.0, risk_amount=50.0)
+check("units rounded down to 100s", out2["units_approx"] <= out2["standard_lots"] * 100000 and out2["units_approx"] % 100 == 0)
+check("floored units risk no more than intended", out2["max_loss_usd_at_floored_units"] <= 50.0 + 1e-9)
+
 # --- bar freshness
 import time as _t
 fresh = [{"ts": int(_t.time()) - 60, "open": 1, "high": 1, "low": 1, "close": 1}]

@@ -47,7 +47,15 @@ L.append("\n" + msg + "\n")
 L.append("## 2. Gaps and calendar coverage\n")
 L.append("- Yahoo's forex week runs Monday 00:00 UTC to Friday ~21:30 UTC. There is **no Sunday-evening session** in this feed; "
          "the week-end gap (Fri ~21:30 to Mon 00:00, ~50 hours) is expected and present every week.")
-L.append("- 5-minute data: each pair had 1-2 small intraday gaps (15-25 minutes) over 60 days. Known examples: 2026-10-09 21:25-21:50 UTC (several pairs), 2026-10-15 06:10-06:25 UTC.")
+gap_ex = []
+for r in V["internal"]:
+    if r["interval"] == "5m":
+        for e in r.get("unexpected_gap_examples", []):
+            gap_ex.append("%s %s" % (r["pair"], e))
+if gap_ex:
+    L.append("- 5-minute data: occasional small intraday gaps over 60 days. Examples flagged this run: " + "; ".join(gap_ex[:6]) + ".")
+else:
+    L.append("- 5-minute data: no unexpected intraday gaps were flagged over 60 days this run.")
 L.append("- 1-hour data reaches back to 2024-02-02 (~2.8 years), not further, and shows occasional longer holiday gaps (e.g. year-end).")
 L.append("- This is an unofficial endpoint with no SLA: fine for analysis, not for execution. The tools already print the age of the newest bar with every run.\n")
 L.append("## 3. Cross-check against official ECB reference rates\n")
@@ -69,9 +77,8 @@ for c in V["ecb_cross"]:
         w0 = c["worst5"][0]
         L.append("- %s worst day %s: Yahoo %.5f vs ECB %.5f (%.2f%%)" % (c["pair"], w0["day"], w0["yahoo"], w0["ecb"], w0["dev_pct"]))
 L.append("")
-L.append("Those dates are 2024-07-11 (US CPI shock), 2024-08-05 (yen carry-trade unwind), 2025-01-20 (US inauguration), "
-         "2025-04-04/10 (tariff turmoil), 2025-08-01 (US jobs report shock) and 2026-07-30 (BoJ decision day). "
-         "On those days the ECB print and any spot feed diverge by this much purely from timing.\n")
+L.append("Those dates line up with well-known macro event days (US CPI shocks, the 2024-08 yen carry-trade unwind, tariff turmoil, "
+         "central-bank decision days). On days like these the ECB print and any spot feed diverge by this much purely from timing.\n")
 L.append("## 4. Scope, and measured vs hypothesized\n")
 L.append("MEASURED: (a) internal consistency of every bar, (b) calendar coverage and gaps, (c) agreement with ONE independent "
          "official daily reference source at one time of day, over ~2.8 years and 710 trading days per pair.")
@@ -112,7 +119,10 @@ L.append("- Simulated capital: **USD 10,000 per pair, risking 1% of current equi
          "and pip value, rounded down to 100-unit steps, pip values converted to USD with that day's own rates. "
          "Also an equal-weight 10-pair portfolio view: $10,000 split into ten independent $1,000 slices, each pair simulated against its own slice with 1% risk of the slice per trade, daily P&L summed across slices; per-pair expectancy does not depend on cross-pair correlation (portfolio-level drawdown does).")
 L.append("- Costs: retail-typical spreads per pair (pips): EURUSD 0.6, GBPUSD 0.9, USDJPY 0.7, USDCHF 1.0, USDCAD 1.2, AUDUSD 0.8, "
-         "NZDUSD 1.4, EURGBP 1.1, EURJPY 1.2, GBPJPY 2.0 - applied adversely at entry AND exit (the repo's own convention). "
+         "NZDUSD 1.4, EURGBP 1.1, EURJPY 1.2, GBPJPY 2.0 - charged as an adverse FILL cost: the entry fills half a spread worse than "
+         "mid (a buy pays the ask, a sell receives the bid) and every exit fills half a spread worse than the trigger level, with R "
+         "measured against the intended stop distance. Trigger levels stay at the mid-bar levels (bid/ask trigger displacement is "
+         "second-order and not modeled). See the cost-model section below for the 2026-11-19 correction. "
          "Scenarios: gross (no costs), net (1x), stress (2x). Slippage, gaps and commissions are NOT modeled: real fills would be worse, "
          "so every number here is optimistic relative to live trading.")
 L.append("- Cost provenance: the spreads above are ASSUMPTIONS chosen to be typical of major retail brokers in 2026, "
@@ -123,6 +133,32 @@ L.append("- Two samples: 5-minute bars, the last ~60 trading days (the tool's na
          "DST-correct London open as the opening range and hourly closes for entries: coarser than the shipped 5-minute workflow, "
          "included for coverage across three different market years. With bars that wide, the stop/target ordering inside one bar "
          "matters; see the ambiguity section below.\n")
+
+CM = json.load(open(os.path.join(HERE, "results", "cost_model_check.json")))
+L.append("## Cost model (corrected 2026-11-19)\n")
+L.append("The first published version of this backtest (commits through 39f1c04) shifted the stop and target TRIGGER levels half a "
+         "spread in the FAVORABLE direction - the stop further from entry, the target nearer - while the code comment and this document "
+         "claimed the shift was adverse. The fill arithmetic was right; the trigger levels were not. The corrected model keeps triggers "
+         "at the mid-bar levels and charges the spread as an adverse fill cost (entry and every exit half a spread worse than mid, R "
+         "against the intended stop distance). Every number in this report uses the corrected model. The table below reruns the headline "
+         "variant under BOTH models on identical bars (`research/cost_model_check.py`, `results/cost_model_check.json`) - the legacy "
+         "column is what the old code would have reported, the fixed column is what this report shows.\n")
+for label, iv in (("5-minute sample", "5m"), ("1-hour sample", "1h")):
+    L.append("%s, headline variant, legacy (favorable trigger shift) vs fixed (adverse fill cost):" % label)
+    L.append("")
+    L.append("| pair | trades | legacy avg R | fixed avg R | legacy return | fixed return |")
+    L.append("| --- | --- | --- | --- | --- | --- |")
+    for p in PAIRS:
+        r = CM[iv][p]
+        L.append("| %s | %d | %+.4f | %+.4f | %s%% | %s%% |" % (
+            p, r["trades"], r["legacy_avg_r"], r["fixed_avg_r"], r["legacy_return_pct"], r["fixed_return_pct"]))
+    L.append("")
+leg_better = sum(1 for iv in ("5m", "1h") for p in PAIRS if CM[iv][p]["legacy_avg_r"] > CM[iv][p]["fixed_avg_r"])
+L.append("Read: in %d of %d pair-samples the legacy model reported a HIGHER average R than the truth - the favorable trigger shift "
+         "flattered the rule it was supposed to stress. The error was found by re-reading the level arithmetic against the comment, "
+         "not by a bad-looking number: the published conclusions still held, which is exactly why this class of bug survives. "
+         "Regression coverage for the corrected convention (cost leaves hit counts unchanged, reduces avg R by exactly cost/R, for "
+         "both sides) is in `test_fx.py`.\n" % (leg_better, 20))
 
 for label, B in (("5-minute bars, last ~60 trading days", B5), ("1-hour bars, 2024-02 to 2026-11 (~2.8 years)", B1)):
     L.append("## Headline variant on %s\n" % label)
@@ -202,11 +238,19 @@ for label, B in (("5-minute sample", B5), ("1-hour sample", B1)):
         o = B["headline_optimistic_tiebreak"][p]
         L.append("| %s | %d | %d | %s%% | %s%% |" % (p, h["trades"], h["trades_with_ambiguous_bar"], h["return_pct"], o["return_pct"]))
     L.append("")
-L.append("Read: on 5-minute bars the ambiguity is negligible (1 trade in 483) - the conservative convention costs nothing. "
-         "On hourly bars 175 of 7,123 trades (2.5%) contain an ambiguous bar, and the bound is wide for a few JPY pairs "
-         "(USDJPY -8.7% to +38.2%). The truth sits between the two columns; even at the unreachable upper bound, "
-         "7 of 10 pairs still lose 8-53% over the sample, and the no-edge conclusion stands under EITHER resolution. "
-         "Whoever reruns this can pick their own convention - both are shipped.\n")
+amb = {}
+for label, B in (("5-minute", B5), ("1-hour", B1)):
+    tot_tr = sum(B["headline"][p]["trades"] for p in PAIRS)
+    tot_amb = sum(B["headline"][p]["trades_with_ambiguous_bar"] for p in PAIRS)
+    neg_opt = sum(1 for p in PAIRS if B["headline_optimistic_tiebreak"][p]["return_pct"] < 0)
+    amb[label] = (tot_tr, tot_amb, neg_opt)
+L.append("Read: on 5-minute bars the ambiguity is negligible (%d of %d trades) - the conservative convention costs almost nothing. "
+         "On hourly bars %d of %d trades (%.1f%%) contain an ambiguous bar, and the bound is wide for some pairs. "
+         "The truth sits between the two columns; even at the unreachable upper bound, %d of 10 pairs still lose over the sample, "
+         "and the no-edge conclusion stands under EITHER resolution. "
+         "Whoever reruns this can pick their own convention - both are shipped.\n" % (
+    amb["5-minute"][1], amb["5-minute"][0], amb["1-hour"][1], amb["1-hour"][0],
+    100.0 * amb["1-hour"][1] / max(1, amb["1-hour"][0]), amb["1-hour"][2]))
 L.append("## Parameter sensitivity (the noise signature)\n")
 L.append("If the rule had a real edge, nearby parameters would agree. They do not. Net avg R for follow/or-mid/1R:\n")
 L.append("| pair | 5m: 07:00/30min | 5m: 07:00/60min | 5m: 08:00/30min | 5m: 08:00/60min |")
@@ -219,21 +263,34 @@ for p in PAIRS:
                 row.append("%+.4f" % s["avg_r"])
     L.append("| " + " | ".join(row) + " |")
 L.append("")
-L.append("EURUSD goes from +0.23R to -0.20R by moving the session anchor one hour; GBPUSD from +0.25R to -0.11R. "
-         "Sign flips from tiny parameter moves are what noise looks like.\n")
+swings = []
+for p in PAIRS:
+    vals = [s["avg_r"] for s in B5["sensitivity"] if s["pair"] == p]
+    if vals:
+        swings.append((max(vals) - min(vals), p, min(vals), max(vals)))
+swings.sort(reverse=True)
+worst = swings[0] if swings else None
+if worst:
+    L.append("%s swings from %+.2fR to %+.2fR across those four neighbouring settings - the largest swing in the table. "
+             "Sign flips from tiny parameter moves are what noise looks like.\n" % (worst[1], worst[2], worst[3]))
+else:
+    L.append("Sign flips from tiny parameter moves are what noise looks like.\n")
 L.append("## Cross-checks of the shipped code\n")
 L.append("- An independent re-implementation of the rule reproduces the repo's own `history_replay` outcome counts EXACTLY on identical data "
          "(EURUSD, 49 pool days: buy 13 target / 20 stop / 1 neither; sell 22 / 16 / 3). The shipped code computes what its README says it computes, "
          "including its no-same-day-lookahead claim.")
-L.append("- `python3 test_fx.py` (28 offline checks incl. DST rules, stop-first tie-break, walk-forward pool construction): all pass.")
+L.append("- `python3 test_fx.py` (offline checks incl. DST rules, stop-first tie-break, walk-forward pool construction, "
+         "adverse-cost accounting and unit rounding): all pass.")
 L.append("- `fx_timemachine.py run` end-to-end on a live plan (EURUSD buy, 1R, 20,000 replays + 10-day walk-forward): runs, labels its own output "
          "correctly as in-sample descriptive statistics, and its walk-forward section honestly states the sample is too small to validate an edge.\n")
 L.append("## Conclusions\n")
 L.append("1. **Data: fit for purpose.** Internally consistent, unbiased vs official ECB reference rates, with documented coverage limits.")
 L.append("2. **The shipped strategy has no positive expectancy after realistic costs in any meaningful test.** Before costs it is a coin flip "
          "(long-sample gross expectancy ~0.0R); after a retail spread it loses reliably and consistently across 2024, 2025 and 2026. "
-         "A $10,000 account trading it mechanically on the 10 tested pairs would have lost roughly 5% in the last 60 trading days at "
-         "5-minute granularity and roughly 41% over 2.8 years at hourly granularity, with drawdowns to match (conservative tie-break; even the unreachable optimistic bound leaves 7 of 10 pairs negative - see the ambiguity section).")
+         "A $10,000 account trading it mechanically on the 10 tested pairs would have lost roughly %.0f%% in the last 60 trading days at "
+         "5-minute granularity and roughly %.0f%% over 2.8 years at hourly granularity, with drawdowns to match "
+         "(conservative tie-break; even the unreachable optimistic bound leaves most pairs negative - see the ambiguity section)." % (
+    -B5["portfolio"]["return_pct"], -B1["portfolio"]["return_pct"]))
 L.append("3. **Following the breakout beats a coin flip by nothing.** The random-direction control performs the same.")
 L.append("4. **No parameter set rescued it.** 360 net-cost variants per timeframe; the few positive cells are fewer than chance produces, "
          "and neighbouring parameters flip sign.")
@@ -247,12 +304,12 @@ w(os.path.join(HERE, "BACKTESTS.md"), "\n".join(L))
 L = []
 L.append("# research/\n")
 L.append("Independent validation of fxpulse, November 2026. Simulation only - no real orders were or can be placed from this project.\n")
-L.append("- **DATA-CORRECTNESS.md** - are the free data feeds any good? Internal consistency screens plus a 710-day cross-check against "
-         "official ECB reference rates. Short answer: yes for analysis, with documented limits.")
+L.append("- **DATA-CORRECTNESS.md** - are the free data feeds any good? Internal consistency screens plus a %d-day cross-check against "
+         "official ECB reference rates. Short answer: yes for analysis, with documented limits." % V["ecb_cross"][0]["compared_days"])
 L.append("- **BACKTESTS.md** - does the shipped opening-range-breakout rule make money with explicit simulated capital ($10,000/pair, 1% risk, "
          "realistic spreads, all variants shown)? Short answer: no - gross it is a coin flip, net it loses reliably across 2.8 years and 10 pairs. "
          "The full grids, controls and stress tests are included, losing variants too.")
-L.append("- `fetch_data.py`, `fx_validate.py`, `fx_backtest.py` - the exact code that produced every number (stdlib only).")
+L.append("- `fetch_data.py`, `fx_validate.py`, `fx_backtest.py`, `cost_model_check.py` - the exact code that produced every number (stdlib only).")
 L.append("- `results/` - raw JSON outputs the docs were generated from.\n")
 L.append("## Reproduce\n")
 L.append("```bash")
@@ -260,7 +317,8 @@ L.append("python3 fetch_data.py        # caches Yahoo bars to ./data (personal u
 L.append("python3 fx_validate.py       # data correctness -> results/validate_results.json")
 L.append("python3 fx_backtest.py --timeframe 5m   # -> results/backtest_5m.json")
 L.append("python3 fx_backtest.py --timeframe 1h   # -> results/backtest_1h.json")
-L.append("python3 gen_docs.py          # rebuild the two markdown reports from the JSONs")
+L.append("python3 cost_model_check.py  # legacy vs corrected cost model -> results/cost_model_check.json")
+L.append("python3 gen_docs.py          # rebuild the markdown reports from the JSONs")
 L.append("```")
 L.append("")
 L.append("The scripts expect the repo one directory up on `sys.path` (they import `fxdata`/`fx_scan` so the shipped code itself is tested) "

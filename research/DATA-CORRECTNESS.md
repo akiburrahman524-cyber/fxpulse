@@ -8,33 +8,33 @@ Every bar of every pair was checked for: high >= max(open, close), low <= min(op
 
 | pair | interval | bars | span (UTC) | OHLC violations | dup/non-monotonic ts | Saturday bars | range outliers |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| EURUSD | 5m | 16813 | 2026-08-27 23:00 to 2026-11-19 04:12 | 0 | 0/0 | 0 | 0 |
-| EURUSD | 1h | 17183 | 2024-02-02 00:00 to 2026-11-19 04:12 | 0 | 0/0 | 0 | 0 |
-| GBPUSD | 5m | 16816 | 2026-08-27 23:00 to 2026-11-19 04:12 | 0 | 0/0 | 0 | 0 |
-| GBPUSD | 1h | 17186 | 2024-02-02 00:00 to 2026-11-19 04:12 | 0 | 0/0 | 0 | 0 |
-| USDJPY | 5m | 16746 | 2026-08-27 23:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| USDJPY | 1h | 17088 | 2024-02-02 00:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| USDCHF | 5m | 16748 | 2026-08-27 23:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| USDCHF | 1h | 17121 | 2024-02-02 00:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| USDCAD | 5m | 16761 | 2026-08-27 23:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| USDCAD | 1h | 17253 | 2024-02-02 00:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| AUDUSD | 5m | 16824 | 2026-08-27 23:00 to 2026-11-19 04:11 | 0 | 0/0 | 0 | 0 |
-| AUDUSD | 1h | 17250 | 2024-02-02 00:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| NZDUSD | 5m | 16825 | 2026-08-27 23:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 2 |
-| NZDUSD | 1h | 17251 | 2024-02-02 00:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| EURGBP | 5m | 16820 | 2026-08-27 23:00 to 2026-11-19 04:13 | 0 | 0/0 | 0 | 0 |
-| EURGBP | 1h | 17206 | 2024-02-02 00:00 to 2026-11-19 04:14 | 0 | 0/0 | 0 | 0 |
-| EURJPY | 5m | 16808 | 2026-08-27 23:00 to 2026-11-19 04:14 | 0 | 0/0 | 0 | 0 |
-| EURJPY | 1h | 17191 | 2024-02-02 00:00 to 2026-11-19 04:14 | 0 | 0/0 | 0 | 0 |
-| GBPJPY | 5m | 16809 | 2026-08-27 23:00 to 2026-11-19 04:14 | 0 | 0/0 | 0 | 0 |
-| GBPJPY | 1h | 17188 | 2024-02-02 00:00 to 2026-11-19 04:14 | 0 | 0/0 | 0 | 0 |
+| EURUSD | 5m | 16818 | 2026-08-27 23:00 to 2026-11-19 04:38 | 0 | 0/0 | 0 | 0 |
+| EURUSD | 1h | 17183 | 2024-02-02 00:00 to 2026-11-19 04:38 | 0 | 0/0 | 0 | 0 |
+| GBPUSD | 5m | 16821 | 2026-08-27 23:00 to 2026-11-19 04:38 | 0 | 0/0 | 0 | 0 |
+| GBPUSD | 1h | 17186 | 2024-02-02 00:00 to 2026-11-19 04:38 | 0 | 0/0 | 0 | 0 |
+| USDJPY | 5m | 16751 | 2026-08-27 23:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| USDJPY | 1h | 17088 | 2024-02-02 00:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| USDCHF | 5m | 16753 | 2026-08-27 23:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| USDCHF | 1h | 17121 | 2024-02-02 00:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| USDCAD | 5m | 16766 | 2026-08-27 23:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| USDCAD | 1h | 17253 | 2024-02-02 00:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| AUDUSD | 5m | 16830 | 2026-08-27 23:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| AUDUSD | 1h | 17250 | 2024-02-02 00:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| NZDUSD | 5m | 16830 | 2026-08-27 23:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 2 |
+| NZDUSD | 1h | 17251 | 2024-02-02 00:00 to 2026-11-19 04:39 | 0 | 0/0 | 0 | 0 |
+| EURGBP | 5m | 16826 | 2026-08-27 23:00 to 2026-11-19 04:40 | 0 | 0/0 | 0 | 0 |
+| EURGBP | 1h | 17206 | 2024-02-02 00:00 to 2026-11-19 04:41 | 0 | 0/0 | 0 | 0 |
+| EURJPY | 5m | 16814 | 2026-08-27 23:00 to 2026-11-19 04:41 | 0 | 0/0 | 0 | 0 |
+| EURJPY | 1h | 17191 | 2024-02-02 00:00 to 2026-11-19 04:41 | 0 | 0/0 | 0 | 0 |
+| GBPJPY | 5m | 16815 | 2026-08-27 23:00 to 2026-11-19 04:41 | 0 | 0/0 | 0 | 0 |
+| GBPJPY | 1h | 17188 | 2024-02-02 00:00 to 2026-11-19 04:41 | 0 | 0/0 | 0 | 0 |
 
-All structural checks are zero across 339887 bars. The bad-tick screen flagged 2 single bars (NZDUSD 5m: 2026-09-02 01:50:00 range 0.31%; NZDUSD 5m: 2026-09-30 12:00:00 range 0.32%). Inspection shows these are genuine fast moves, not bad ticks: the neighbouring bars continue from the new level with no spike-and-revert pattern (a real 0.3% 5-minute move in NZDUSD is 25x that pair's very quiet median bar). The feed is internally coherent.
+All structural checks are zero across 339941 bars. The bad-tick screen flagged 2 single bars (NZDUSD 5m: 2026-09-02 01:50:00+00:00 range 0.31%; NZDUSD 5m: 2026-09-30 12:00:00+00:00 range 0.32%). Inspection shows these are genuine fast moves, not bad ticks: the neighbouring bars continue from the new level with no spike-and-revert pattern (a real 0.3% 5-minute move in NZDUSD is 25x that pair's very quiet median bar). The feed is internally coherent.
 
 ## 2. Gaps and calendar coverage
 
 - Yahoo's forex week runs Monday 00:00 UTC to Friday ~21:30 UTC. There is **no Sunday-evening session** in this feed; the week-end gap (Fri ~21:30 to Mon 00:00, ~50 hours) is expected and present every week.
-- 5-minute data: each pair had 1-2 small intraday gaps (15-25 minutes) over 60 days. Known examples: 2026-10-09 21:25-21:50 UTC (several pairs), 2026-10-15 06:10-06:25 UTC.
+- 5-minute data: occasional small intraday gaps over 60 days. Examples flagged this run: EURUSD 2026-10-15 06:10:00+00:00 -> 2026-10-15 06:30:00+00:00 (0.3h); EURUSD 2026-10-23 21:25:00+00:00 -> 2026-10-26 00:00:00+00:00 (50.6h); EURUSD 2026-10-30 21:25:00+00:00 -> 2026-11-02 00:00:00+00:00 (50.6h); EURUSD 2026-11-06 22:25:00+00:00 -> 2026-11-09 00:00:00+00:00 (49.6h); EURUSD 2026-11-13 22:25:00+00:00 -> 2026-11-16 00:00:00+00:00 (49.6h); GBPUSD 2026-10-15 06:10:00+00:00 -> 2026-10-15 06:30:00+00:00 (0.3h).
 - 1-hour data reaches back to 2024-02-02 (~2.8 years), not further, and shows occasional longer holiday gaps (e.g. year-end).
 - This is an unofficial endpoint with no SLA: fine for analysis, not for execution. The tools already print the age of the newest bar with every run.
 
@@ -67,7 +67,7 @@ How to read this: the signed means are all near zero (no systematic bias - Yahoo
 - EURJPY worst day 2026-07-30: Yahoo 184.07500 vs ECB 186.99000 (1.56%)
 - GBPJPY worst day 2026-07-30: Yahoo 214.50200 vs ECB 218.15318 (1.67%)
 
-Those dates are 2024-07-11 (US CPI shock), 2024-08-05 (yen carry-trade unwind), 2025-01-20 (US inauguration), 2025-04-04/10 (tariff turmoil), 2025-08-01 (US jobs report shock) and 2026-07-30 (BoJ decision day). On those days the ECB print and any spot feed diverge by this much purely from timing.
+Those dates line up with well-known macro event days (US CPI shocks, the 2024-08 yen carry-trade unwind, tariff turmoil, central-bank decision days). On days like these the ECB print and any spot feed diverge by this much purely from timing.
 
 ## 4. Scope, and measured vs hypothesized
 
