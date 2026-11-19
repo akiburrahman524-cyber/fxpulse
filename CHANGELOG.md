@@ -4,6 +4,20 @@ Notable corrections and changes, newest first. This project publishes its
 mistakes openly: each entry says what was wrong, what it changed, and where
 the measurement lives.
 
+## 2026-11-19 - Uncertainty reporting and input hardening (9393457)
+
+- Headline backtest tables now carry a bootstrap 95% confidence interval
+  for average R per pair (the `bootstrap_ci` helper existed but was never
+  called). On the 5-minute sample 7 of 10 pairs are statistically
+  indistinguishable from break-even; on the 1-hour sample 4 of 10. The
+  negative drift after costs is consistent across samples, but at these
+  sample sizes most individual cells cannot be proven different from zero -
+  the reports now say so with numbers.
+- `fx_size` rejects non-positive balance/risk and risk above the balance
+  (previously produced negative or absurd sizes silently).
+- `fx_plan --stop-rule fixed` without `--stop` gives a clear error instead
+  of a bare KeyError.
+
 ## 2026-11-19 - JPY-pair pip value 100x error in fx_size (5627cb5)
 
 - **Wrong:** `fxdata.pip_value_usd` used 10 quote-currency units per pip per
