@@ -1,0 +1,11 @@
+fxpulse was newly written for its owner in November 2026.
+
+Methodological inspiration: the open-source project "day-trader-skill" by
+Jake Schincariol (https://github.com/Jakeschincariol/day-trader-skill, MIT
+License), whose README publicly describes its session-replay method. No code
+from that project is copied into this repository; fxpulse re-implements the
+described method for the forex market.
+
+Data used by the tools belongs to its respective providers (Yahoo Finance,
+Frankfurter / central banks, GDELT Project, Twelve Data) and is fetched by
+each user from the providers' own endpoints under each provider's terms.

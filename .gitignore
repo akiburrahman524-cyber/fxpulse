@@ -1,0 +1,7 @@
+.cache/
+config.json
+plan.json
+journal.json
+timemachine.json
+__pycache__/
+.personal-use-ack

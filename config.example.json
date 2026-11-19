@@ -1,0 +1,4 @@
+{
+  "twelvedata_key": "",
+  "notes": "twelvedata_key is OPTIONAL and empty by default. If you set your own key, you confirm your use stays within your Twelve Data plan's terms (free tier = internal use only, no external display or commercial use): https://twelvedata.com/terms . This project sends a key only to Twelve Data's own API and never shares it."
+}
