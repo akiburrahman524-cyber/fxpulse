@@ -1,0 +1,997 @@
+{
+  "run_utc": "2026-11-19T04:20:24.115500",
+  "internal": [
+    {
+      "pair": "EURUSD",
+      "interval": "5m",
+      "bars": 16813,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:12:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 1,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:30:00 (0.3h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:25:00 -> 2026-11-02 00:00:00 (50.6h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0115,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "EURUSD",
+      "interval": "1h",
+      "bars": 17183,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:12:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 1,
+        "intraday_gap_lt24h": 9,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.0815,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "GBPUSD",
+      "interval": "5m",
+      "bars": 16816,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:12:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 2,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:30:00 (0.3h)",
+        "2026-10-16 21:25:00 -> 2026-10-16 22:45:00 (1.3h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:25:00 -> 2026-11-02 00:00:00 (50.6h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0145,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "GBPUSD",
+      "interval": "1h",
+      "bars": 17186,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:12:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 8,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.0865,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDJPY",
+      "interval": "5m",
+      "bars": 16746,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:13:24",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 1,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 20:55:00 -> 2026-10-26 00:00:00 (51.1h)",
+        "2026-10-30 20:55:00 -> 2026-11-02 00:00:00 (51.1h)",
+        "2026-11-06 22:00:00 -> 2026-11-09 00:00:00 (50.0h)",
+        "2026-11-13 21:55:00 -> 2026-11-16 00:00:00 (50.1h)"
+      ],
+      "median_bar_range_pct": 0.0329,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDJPY",
+      "interval": "1h",
+      "bars": 17088,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:13:28",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 7,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 21:00:00 -> 2024-02-05 00:00:00 (51.0h)",
+        "2024-02-09 21:00:00 -> 2024-02-12 00:00:00 (51.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 21:00:00 -> 2024-03-04 00:00:00 (51.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1235,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDCHF",
+      "interval": "5m",
+      "bars": 16748,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:13:31",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 2,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 21:00:00 -> 2026-10-26 00:00:00 (51.0h)",
+        "2026-10-30 21:00:00 -> 2026-10-30 23:10:00 (2.2h)",
+        "2026-10-30 23:10:00 -> 2026-11-02 00:00:00 (48.8h)",
+        "2026-11-06 22:00:00 -> 2026-11-09 00:00:00 (50.0h)",
+        "2026-11-13 22:00:00 -> 2026-11-16 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.0339,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDCHF",
+      "interval": "1h",
+      "bars": 17121,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:13:34",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 3,
+        "intraday_gap_lt24h": 11,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1174,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDCAD",
+      "interval": "5m",
+      "bars": 16761,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:13:37",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 8,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-08-28 21:00:00 -> 2026-08-28 22:10:00 (1.2h)",
+        "2026-09-18 21:00:00 -> 2026-09-18 21:50:00 (0.8h)",
+        "2026-10-02 21:00:00 -> 2026-10-02 21:15:00 (0.2h)",
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 21:00:00 -> 2026-10-23 21:25:00 (0.4h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)"
+      ],
+      "median_bar_range_pct": 0.0471,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "USDCAD",
+      "interval": "1h",
+      "bars": 17253,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:13:40",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 3,
+        "intraday_gap_lt24h": 3,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1012,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "AUDUSD",
+      "interval": "5m",
+      "bars": 16824,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:11:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 1,
+        "intraday_gap_lt24h": 2,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:30:00 (0.3h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:30:00 -> 2026-10-30 23:10:00 (1.7h)",
+        "2026-10-30 23:35:00 -> 2026-11-02 00:00:00 (48.4h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0138,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "AUDUSD",
+      "interval": "1h",
+      "bars": 17250,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:13:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 3,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1238,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "NZDUSD",
+      "interval": "5m",
+      "bars": 16825,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:13:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 2,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:30:00 (0.3h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:30:00 -> 2026-10-30 23:10:00 (1.7h)",
+        "2026-10-30 23:35:00 -> 2026-11-02 00:00:00 (48.4h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0117,
+      "range_outliers_gt25x": 2,
+      "outlier_examples": [
+        "2026-09-02 01:50:00 range 0.31%",
+        "2026-09-30 12:00:00 range 0.32%"
+      ]
+    },
+    {
+      "pair": "NZDUSD",
+      "interval": "1h",
+      "bars": 17251,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:13:46",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 5,
+        "intraday_gap_lt24h": 3,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1149,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "EURGBP",
+      "interval": "5m",
+      "bars": 16820,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:13:57",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 2,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-09 21:25:00 -> 2026-10-09 21:50:00 (0.4h)",
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:25:00 -> 2026-11-02 00:00:00 (50.6h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0175,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "EURGBP",
+      "interval": "1h",
+      "bars": 17206,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:14:01",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 8,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.0694,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "EURJPY",
+      "interval": "5m",
+      "bars": 16808,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:14:04",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 1,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:25:00 -> 2026-11-02 00:00:00 (50.6h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 21:55:00 -> 2026-11-16 00:00:00 (50.1h)"
+      ],
+      "median_bar_range_pct": 0.0302,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "EURJPY",
+      "interval": "1h",
+      "bars": 17191,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:14:08",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 2,
+        "intraday_gap_lt24h": 10,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1168,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "GBPJPY",
+      "interval": "5m",
+      "bars": 16809,
+      "first": "2026-08-27 23:00:00",
+      "last": "2026-11-19 04:14:11",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 8,
+        "one_bar_missing": 0,
+        "intraday_gap_lt24h": 1,
+        "long_gap_gt24h": 4
+      },
+      "unexpected_gap_examples": [
+        "2026-10-15 06:10:00 -> 2026-10-15 06:25:00 (0.2h)",
+        "2026-10-23 21:25:00 -> 2026-10-26 00:00:00 (50.6h)",
+        "2026-10-30 21:25:00 -> 2026-11-02 00:00:00 (50.6h)",
+        "2026-11-06 22:25:00 -> 2026-11-09 00:00:00 (49.6h)",
+        "2026-11-13 22:25:00 -> 2026-11-16 00:00:00 (49.6h)"
+      ],
+      "median_bar_range_pct": 0.0312,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    },
+    {
+      "pair": "GBPJPY",
+      "interval": "1h",
+      "bars": 17188,
+      "first": "2024-02-02 00:00:00",
+      "last": "2026-11-19 04:14:14",
+      "bad_ohlc": 0,
+      "nonpositive": 0,
+      "duplicate_ts": 0,
+      "nonmonotonic_ts": 0,
+      "saturday_bars": 0,
+      "gaps": {
+        "weekly_or_weekend": 88,
+        "one_bar_missing": 1,
+        "intraday_gap_lt24h": 11,
+        "long_gap_gt24h": 58
+      },
+      "unexpected_gap_examples": [
+        "2024-02-02 22:00:00 -> 2024-02-05 00:00:00 (50.0h)",
+        "2024-02-09 22:00:00 -> 2024-02-12 00:00:00 (50.0h)",
+        "2024-02-16 22:00:00 -> 2024-02-19 00:00:00 (50.0h)",
+        "2024-02-23 22:00:00 -> 2024-02-26 00:00:00 (50.0h)",
+        "2024-03-01 22:00:00 -> 2024-03-04 00:00:00 (50.0h)",
+        "2024-03-08 22:00:00 -> 2024-03-11 00:00:00 (50.0h)"
+      ],
+      "median_bar_range_pct": 0.1259,
+      "range_outliers_gt25x": 0,
+      "outlier_examples": []
+    }
+  ],
+  "ecb_cross": [
+    {
+      "pair": "EURUSD",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.1024,
+      "mean_abs_dev_pct": 0.1392,
+      "mean_signed_dev_pct": 0.0392,
+      "max_abs_dev_pct": 1.5266,
+      "days_over_0p5pct": 16,
+      "worst5": [
+        {
+          "day": "2025-08-01",
+          "yahoo": 1.157809,
+          "ecb": 1.1404,
+          "dev_pct": 1.527
+        },
+        {
+          "day": "2025-01-20",
+          "yahoo": 1.041775,
+          "ecb": 1.0316,
+          "dev_pct": 0.986
+        },
+        {
+          "day": "2024-04-10",
+          "yahoo": 1.075384,
+          "ecb": 1.086,
+          "dev_pct": 0.977
+        },
+        {
+          "day": "2025-04-23",
+          "yahoo": 1.13353,
+          "ecb": 1.1415,
+          "dev_pct": 0.698
+        },
+        {
+          "day": "2024-06-07",
+          "yahoo": 1.082251,
+          "ecb": 1.0898,
+          "dev_pct": 0.693
+        }
+      ]
+    },
+    {
+      "pair": "GBPUSD",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.097,
+      "mean_abs_dev_pct": 0.1336,
+      "mean_signed_dev_pct": 0.0115,
+      "max_abs_dev_pct": 1.0492,
+      "days_over_0p5pct": 17,
+      "worst5": [
+        {
+          "day": "2024-04-10",
+          "yahoo": 1.256629,
+          "ecb": 1.269953,
+          "dev_pct": 1.049
+        },
+        {
+          "day": "2025-08-01",
+          "yahoo": 1.328374,
+          "ecb": 1.316099,
+          "dev_pct": 0.933
+        },
+        {
+          "day": "2025-01-20",
+          "yahoo": 1.230557,
+          "ecb": 1.219558,
+          "dev_pct": 0.902
+        },
+        {
+          "day": "2024-10-31",
+          "yahoo": 1.288145,
+          "ecb": 1.299297,
+          "dev_pct": 0.858
+        },
+        {
+          "day": "2024-02-02",
+          "yahoo": 1.265743,
+          "ecb": 1.276404,
+          "dev_pct": 0.835
+        }
+      ]
+    },
+    {
+      "pair": "USDJPY",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.1134,
+      "mean_abs_dev_pct": 0.1642,
+      "mean_signed_dev_pct": -0.017,
+      "max_abs_dev_pct": 1.9639,
+      "days_over_0p5pct": 30,
+      "worst5": [
+        {
+          "day": "2026-07-30",
+          "yahoo": 159.740005,
+          "ecb": 162.940049,
+          "dev_pct": 1.964
+        },
+        {
+          "day": "2024-07-11",
+          "yahoo": 158.602005,
+          "ecb": 161.575311,
+          "dev_pct": 1.84
+        },
+        {
+          "day": "2025-08-01",
+          "yahoo": 148.134003,
+          "ecb": 150.482287,
+          "dev_pct": 1.561
+        },
+        {
+          "day": "2024-08-02",
+          "yahoo": 147.076004,
+          "ecb": 148.93401,
+          "dev_pct": 1.248
+        },
+        {
+          "day": "2024-08-15",
+          "yahoo": 149.078003,
+          "ecb": 147.252747,
+          "dev_pct": 1.24
+        }
+      ]
+    },
+    {
+      "pair": "USDCHF",
+      "compared_days": 710,
+      "median_abs_dev_pct": 0.1048,
+      "mean_abs_dev_pct": 0.1458,
+      "mean_signed_dev_pct": -0.0201,
+      "max_abs_dev_pct": 1.4788,
+      "days_over_0p5pct": 26,
+      "worst5": [
+        {
+          "day": "2025-08-01",
+          "yahoo": 0.80448,
+          "ecb": 0.816556,
+          "dev_pct": 1.479
+        },
+        {
+          "day": "2024-04-10",
+          "yahoo": 0.91186,
+          "ecb": 0.903315,
+          "dev_pct": 0.946
+        },
+        {
+          "day": "2026-08-19",
+          "yahoo": 0.80254,
+          "ecb": 0.810168,
+          "dev_pct": 0.942
+        },
+        {
+          "day": "2024-08-02",
+          "yahoo": 0.86264,
+          "ecb": 0.870605,
+          "dev_pct": 0.915
+        },
+        {
+          "day": "2024-02-13",
+          "yahoo": 0.88622,
+          "ecb": 0.87844,
+          "dev_pct": 0.886
+        }
+      ]
+    },
+    {
+      "pair": "USDCAD",
+      "compared_days": 710,
+      "median_abs_dev_pct": 0.0807,
+      "mean_abs_dev_pct": 0.1091,
+      "mean_signed_dev_pct": -0.0086,
+      "max_abs_dev_pct": 1.1879,
+      "days_over_0p5pct": 8,
+      "worst5": [
+        {
+          "day": "2025-01-20",
+          "yahoo": 1.4295,
+          "ecb": 1.446685,
+          "dev_pct": 1.188
+        },
+        {
+          "day": "2024-02-13",
+          "yahoo": 1.35624,
+          "ecb": 1.344483,
+          "dev_pct": 0.874
+        },
+        {
+          "day": "2025-03-11",
+          "yahoo": 1.45155,
+          "ecb": 1.441624,
+          "dev_pct": 0.689
+        },
+        {
+          "day": "2025-08-01",
+          "yahoo": 1.37792,
+          "ecb": 1.387408,
+          "dev_pct": 0.684
+        },
+        {
+          "day": "2024-04-10",
+          "yahoo": 1.36529,
+          "ecb": 1.356169,
+          "dev_pct": 0.673
+        }
+      ]
+    },
+    {
+      "pair": "AUDUSD",
+      "compared_days": 710,
+      "median_abs_dev_pct": 0.1257,
+      "mean_abs_dev_pct": 0.174,
+      "mean_signed_dev_pct": 0.0344,
+      "max_abs_dev_pct": 1.4143,
+      "days_over_0p5pct": 33,
+      "worst5": [
+        {
+          "day": "2024-04-10",
+          "yahoo": 0.652869,
+          "ecb": 0.662236,
+          "dev_pct": 1.414
+        },
+        {
+          "day": "2024-06-12",
+          "yahoo": 0.669411,
+          "ecb": 0.661241,
+          "dev_pct": 1.236
+        },
+        {
+          "day": "2024-02-02",
+          "yahoo": 0.653108,
+          "ecb": 0.660857,
+          "dev_pct": 1.173
+        },
+        {
+          "day": "2025-01-20",
+          "yahoo": 0.627679,
+          "ecb": 0.620437,
+          "dev_pct": 1.167
+        },
+        {
+          "day": "2024-02-13",
+          "yahoo": 0.646037,
+          "ecb": 0.653092,
+          "dev_pct": 1.08
+        }
+      ]
+    },
+    {
+      "pair": "NZDUSD",
+      "compared_days": 710,
+      "median_abs_dev_pct": 0.1226,
+      "mean_abs_dev_pct": 0.1719,
+      "mean_signed_dev_pct": 0.0388,
+      "max_abs_dev_pct": 1.3974,
+      "days_over_0p5pct": 34,
+      "worst5": [
+        {
+          "day": "2024-04-10",
+          "yahoo": 0.5997,
+          "ecb": 0.608199,
+          "dev_pct": 1.397
+        },
+        {
+          "day": "2025-01-20",
+          "yahoo": 0.567247,
+          "ecb": 0.560439,
+          "dev_pct": 1.215
+        },
+        {
+          "day": "2024-06-12",
+          "yahoo": 0.62135,
+          "ecb": 0.61416,
+          "dev_pct": 1.171
+        },
+        {
+          "day": "2024-02-02",
+          "yahoo": 0.608865,
+          "ecb": 0.615798,
+          "dev_pct": 1.126
+        },
+        {
+          "day": "2024-06-07",
+          "yahoo": 0.61252,
+          "ecb": 0.619345,
+          "dev_pct": 1.102
+        }
+      ]
+    },
+    {
+      "pair": "EURGBP",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.0538,
+      "mean_abs_dev_pct": 0.0748,
+      "mean_signed_dev_pct": -0.0043,
+      "max_abs_dev_pct": 0.6352,
+      "days_over_0p5pct": 4,
+      "worst5": [
+        {
+          "day": "2024-10-31",
+          "yahoo": 0.84285,
+          "ecb": 0.83753,
+          "dev_pct": 0.635
+        },
+        {
+          "day": "2025-07-02",
+          "yahoo": 0.86555,
+          "ecb": 0.8605,
+          "dev_pct": 0.587
+        },
+        {
+          "day": "2025-04-23",
+          "yahoo": 0.8531,
+          "ecb": 0.85793,
+          "dev_pct": 0.563
+        },
+        {
+          "day": "2025-08-01",
+          "yahoo": 0.87099,
+          "ecb": 0.8665,
+          "dev_pct": 0.518
+        },
+        {
+          "day": "2025-05-29",
+          "yahoo": 0.84126,
+          "ecb": 0.8377,
+          "dev_pct": 0.425
+        }
+      ]
+    },
+    {
+      "pair": "EURJPY",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.0932,
+      "mean_abs_dev_pct": 0.1337,
+      "mean_signed_dev_pct": -0.0098,
+      "max_abs_dev_pct": 1.5589,
+      "days_over_0p5pct": 13,
+      "worst5": [
+        {
+          "day": "2026-07-30",
+          "yahoo": 184.074997,
+          "ecb": 186.99,
+          "dev_pct": 1.559
+        },
+        {
+          "day": "2024-07-11",
+          "yahoo": 172.667999,
+          "ecb": 175.39,
+          "dev_pct": 1.552
+        },
+        {
+          "day": "2024-08-05",
+          "yahoo": 157.438004,
+          "ecb": 155.98,
+          "dev_pct": 0.935
+        },
+        {
+          "day": "2024-08-15",
+          "yahoo": 163.514008,
+          "ecb": 162.14,
+          "dev_pct": 0.847
+        },
+        {
+          "day": "2024-10-04",
+          "yahoo": 162.843994,
+          "ecb": 161.69,
+          "dev_pct": 0.714
+        }
+      ]
+    },
+    {
+      "pair": "GBPJPY",
+      "compared_days": 711,
+      "median_abs_dev_pct": 0.1029,
+      "mean_abs_dev_pct": 0.1469,
+      "mean_signed_dev_pct": -0.0146,
+      "max_abs_dev_pct": 1.6737,
+      "days_over_0p5pct": 22,
+      "worst5": [
+        {
+          "day": "2026-07-30",
+          "yahoo": 214.501999,
+          "ecb": 218.153182,
+          "dev_pct": 1.674
+        },
+        {
+          "day": "2024-07-11",
+          "yahoo": 205.018005,
+          "ecb": 208.042228,
+          "dev_pct": 1.454
+        },
+        {
+          "day": "2024-08-15",
+          "yahoo": 191.343994,
+          "ecb": 189.382702,
+          "dev_pct": 1.036
+        },
+        {
+          "day": "2024-10-31",
+          "yahoo": 196.684998,
+          "ecb": 198.560052,
+          "dev_pct": 0.944
+        },
+        {
+          "day": "2025-08-01",
+          "yahoo": 196.542007,
+          "ecb": 198.049625,
+          "dev_pct": 0.761
+        }
+      ]
+    }
+  ],
+  "ecb_method": "Yahoo hourly bar OPEN at ECB fixing instant (16:00 CET/CEST, DST-aware) vs Frankfurter/ECB daily reference rate"
+}

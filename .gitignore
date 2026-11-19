@@ -5,3 +5,10 @@ journal.json
 timemachine.json
 __pycache__/
 .personal-use-ack
+research/data/
+.cache/
+.personal-use-ack
+plan.json
+journal.json
+timemachine.json
+config.json

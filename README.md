@@ -56,6 +56,14 @@ Config: copy `config.example.json` to `config.json` (only needed for an optional
 
 Activation: intraday features need one-time local personal-use activation (`python3 fxdata.py --acknowledge-personal-use`). Without it - or with `FXPULSE_MODE=public` - scan/plan/timemachine refuse to run and only official reference-rate data (Frankfurter/ECB, a few updates a day, NOT live quotes) is used. This is how the project keeps Yahoo's personal-use terms rather than papering over them.
 
+
+## Independent validation (research/)
+
+Does the data hold up, and does the shipped session-breakout rule actually make money? Tested in simulation only, with explicit simulated capital (USD 10,000 per pair, 1% risk per trade, realistic retail spreads), across 10 pairs on 60 days of 5-minute bars and ~2.8 years of hourly bars, with the full parameter grid, random-direction controls, cost stress tests and intrabar-ambiguity bounds - losing variants included, nothing removed.
+
+- [research/DATA-CORRECTNESS.md](research/DATA-CORRECTNESS.md): the free feeds are internally consistent and unbiased vs official ECB reference rates (710 days/pair), with documented coverage limits.
+- [research/BACKTESTS.md](research/BACKTESTS.md): the rule has no positive expectancy after realistic costs in any meaningful test - before costs it is a coin flip, after costs it loses reliably across 2024-2026. The toolkit's value is honest analysis, not a promised edge. Nothing there is financial advice.
+
 ## License
 
 Copyright (c) 2026 Akibur Rahman. Released under the MIT License (see LICENSE): others may use, copy, modify and distribute this software, including commercially, provided the copyright notice and license are kept. See NOTICE for data-provider and inspiration attribution.
