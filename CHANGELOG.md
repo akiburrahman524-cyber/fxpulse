@@ -4,6 +4,12 @@ Notable corrections and changes, newest first. This project publishes its
 mistakes openly: each entry says what was wrong, what it changed, and where
 the measurement lives.
 
+## 2026-11-20 - Daily trend-following study (21 years), plus a quote-currency sizing fix caught pre-publish
+
+- New study `research/DAILY-TREND.md` (`research/fx_daily_trend.py`, `results/daily_trend.json`): the strongest published simple-strategy class - medium-term trend following - tested pre-registered on ~21 years of free daily bars (2003-2026, 10 pairs) with the project's honesty rules: explicit simulated capital, adverse fill costs, gross/net/stress side by side, random-direction controls, all 130 grid cells published. Result: no reliable edge after costs. Portfolio CAGRs -0.6% to +0.8% over two decades, every pooled 95% CI straddles zero, controls land in the same range. Swap/rollover interest is unmodeled and stated as a material caveat. Scoped: these rules, pairs, costs and sample - not proof that no trend implementation could work.
+- **Caught before publish:** the first internal run sized positions in QUOTE currency terms (1% of equity per ATR without converting the ATR to USD), understating JPY-quote risk ~150x - the same bug family as the 2026-11-19 pip-value fix. Fixed before any number was published; the shipped script sizes in USD (`units = risk / (ATR x USD-per-quote)`).
+- Daily-bar date convention documented: Yahoo daily FX bars are timestamped at session START (23:00 UTC), so the week's first bar carries a Sunday UTC date and Friday's session sits under a Thursday UTC date; all pairs share the convention, cross-pair alignment unaffected, ECB spot cross-check (Frankfurter, 5 dates x 3 pairs) consistent with close-vs-fixing timing.
+
 ## 2026-11-19 - Dependence-aware portfolio uncertainty, replay caveat
 
 - The portfolio view now reports a pooled average R with a 95% day-grouped
