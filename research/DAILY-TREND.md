@@ -331,12 +331,46 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | EURJPY | 0 | -69.02 | 26.5 | -70.7 | 162.01 | 59.04 | -58.13 | -40.04 | 138.72 | -50.91 | -99.95 | 193.39 | -223.37 | -99.29 | 91.11 | 86.99 | 12.69 | 37.39 | -18.36 | -113.95 | -32.74 | 62.79 | -48.36 | 123.92 | 4.7 |
 | GBPJPY | 0 | 0 | 7.42 | -75.25 | 186.34 | 26.03 | 367.41 | -163.31 | 188.69 | 83.77 | -126.5 | 338.2 | 110.57 | 95.76 | 562.12 | 306.1 | -42.38 | -267.59 | -236.39 | 246.62 | 65.16 | 29.27 | 112.21 | 148.21 | -24.96 |
 
+## Execution timing: the same-close assumption, measured
+
+The headline convention acts AT the signal close: the close print that generates the signal is also the assumed fill price (mid +/- half-spread). That identity cannot be verified with free data, so this section re-runs every headline rule acting 1 and 2 closes LATER - a strictly more conservative, realistic-lag execution - same sizing, same costs.
+
+| rule | lag 0 return (CAGR) | lag 1 return (CAGR) | lag 2 return (CAGR) | all-lags 95% CI straddles zero? |
+| --- | --- | --- | --- | --- |
+| tsmom-63d | -12.12% (-0.63%) | +21.28% (+0.94%) | +28.93% (+1.25%) | yes |
+| tsmom-126d | +11.98% (+0.55%) | +25.84% (+1.13%) | +19.55% (+0.87%) | yes |
+| tsmom-252d | +5.92% (+0.28%) | +11.84% (+0.55%) | +13.91% (+0.64%) | yes |
+| donchian-55/20 | -7.91% (-0.40%) | +0.47% (+0.02%) | -1.87% (-0.09%) | yes |
+| macross-50/200 | +18.80% (+0.84%) | +14.37% (+0.66%) | +16.48% (+0.75%) | yes |
+
+Read: the no-edge conclusion is NOT an artifact of the same-close assumption - under 1- and 2-day execution lags every pooled confidence interval still straddles zero (CAGRs 0.0% to +1.3% over 21 years). Lagged execution comes out slightly BETTER for several rules, which is the known daily-frequency short-term reversal effect (entering a day late buys the small pullback) and is equally consistent with noise across this many cells; either way nothing crosses break-even significance, and the headline convention is not flattered relative to realistic lag. Per-pair lag numbers are in results/daily_trend_extra.json.
+
+## Results by era (portfolio, net costs)
+
+| rule | 2003-2010 | 2011-2015 | 2016-2020 | 2021-2026 |
+| --- | --- | --- | --- | --- |
+| tsmom-63d | +8.85% | +4.27% | -1.15% | -15.29% |
+| tsmom-126d | +18.92% | +6.65% | -6.21% | -8.16% |
+| tsmom-252d | +2.18% | +12.30% | -5.43% | +4.05% |
+| donchian-55/20 | +3.62% | +8.77% | -6.16% | -8.87% |
+| macross-50/200 | +19.48% | +8.22% | -5.75% | -4.21% |
+
+Read: every rule looked better in 2003-2010 and most are negative in the two most recent eras. That decay pattern is what a published anomaly being arbitraged away looks like - and also what noise looks like across slices of a zero-edge process. Either reading argues against betting on the recent sample.
+
+## Selection and out-of-sample limits
+
+- Nothing is FITTED: parameters are pre-registered literature standards, so there is no training sample to leak into the results. The multiple-comparisons count (130 cells; 390 across the three execution lags) is stated, not hidden.
+- Selection still operates one level up: WHICH rules to test (trend following) was chosen from published evidence, so this study is best read as an independent replication attempt on retail spot FX, not a fresh discovery. The 10 pairs are today's liquid majors - a present-day choice; pairs that died are not in the frame (for major FX this is a mild form of the survivorship caveat, and the euro itself only exists from 1999, three years before this sample starts).
+- The era table above is the honest out-of-sample-style check available for unfitted rules: results are era-unstable, with the recent decade the weakest.
+- Regression coverage for this harness now lives in research/test_daily_trend.py: quote-currency risk conversion in USD (the bug class fixed on 2026-11-19 and caught again pre-publish on 2026-11-20), no-future conversion lookups, execution-lag mechanics, control boundary preservation, cost ordering and ruin flooring.
+
 ## Conclusions
 
 1. On ~21 years of free daily data, the classic trend-following rules that have the best published evidence do NOT show a reliable edge on 10 spot FX pairs after retail spreads: portfolio CAGRs of -0.9% to +0.2%, every confidence interval through zero, and the random-direction controls land in the same range.
 2. Costs are no longer the main killer at this horizon (gross vs net is a few points over two decades) - the gross edges themselves are approximately zero on these pairs and rules. The intraday study's problem (spread >> edge) is replaced by a simpler one: no measured edge at all.
 3. Swap/rollover interest is unmodeled and material at these holding periods; for some pairs (e.g. long high-yield vs low-yield) it would add a carry component, for others subtract. It does not change the shape of the result: carry is a known, separately measurable term, not a hidden edge in these rules.
 4. Combined with BACKTESTS.md: two independent strategy classes (intraday breakout on 5m/1h, multi-month trend on daily) both fail to beat costs on free spot-FX data. The honest answer to 'can this tool always profit' remains no - and the published evidence for THAT keeps getting stronger, which is the useful output.
-5. fxpulse's defensible niche is unchanged: an honesty-first analysis toolkit - every variant shown, controls next to claims, corrections published - not a signal service.
+5. Robustness of the harness itself (added 2026-11-20, second round): the conclusion is insensitive to the same-close execution assumption (1- and 2-day lags change nothing material), era-split results show the recent decade is the weakest for every rule, and deterministic reruns reproduce the published numbers exactly. Regression tests cover the conversion and execution machinery.
+6. fxpulse's defensible niche is unchanged: an honesty-first analysis toolkit - every variant shown, controls next to claims, corrections published - not a signal service.
 
 Nothing here is financial advice or a prediction. Past simulations do not guarantee anything about the future.

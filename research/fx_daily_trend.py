@@ -30,7 +30,7 @@ pair's rate differential), slippage and gaps (daily closes are assumed
 fillable at mid +/- half-spread), commissions. Daily Yahoo bars are mid
 price, personal-use feed; raw bars are cached locally, never committed.
 """
-import json, os, math, random, datetime, statistics
+import json, os, sys, math, random, datetime, statistics
 
 PAIRS = ["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","NZDUSD",
          "EURGBP","EURJPY","GBPJPY"]
@@ -124,10 +124,15 @@ def signal_macross(closes, i, fast, slow):
     return 1 if f > s else -1
 
 def simulate(pair, bars, rule, conv_cache, bars_by_pair, cost_mult=1.0,
-             sign_override=None):
+             sign_override=None, exec_lag=0):
     """rule: (kind, params). Returns dict with equity curve, trades, stats.
     sign_override: optional list of signs (+1/-1) per segment for the
-    random-direction control (same boundaries, randomized direction)."""
+    random-direction control (same boundaries, randomized direction).
+    exec_lag: days between the signal close and the position taking effect.
+    0 = act AT the signal close (the headline convention; assumes the close
+    print is achievable at mid +/- half-spread). 1 or 2 = act at a LATER
+    close, breaking the signal-price-equals-fill-price identity - the
+    realistic-lag sensitivity."""
     kind, params = rule
     closes = [b["close"] for b in bars]
     n = len(bars)
@@ -147,6 +152,8 @@ def simulate(pair, bars, rule, conv_cache, bars_by_pair, cost_mult=1.0,
         fast, slow = params
         for i in range(n):
             pos[i] = signal_macross(closes, i, fast, slow)
+    if exec_lag:
+        pos = ([0] * exec_lag + pos[:n - exec_lag])
     # segments of constant nonzero position
     seg_id = [ -1 ] * n
     segs = []
@@ -238,7 +245,7 @@ def simulate(pair, bars, rule, conv_cache, bars_by_pair, cost_mult=1.0,
     tstat = (avg_r / (statistics.pstdev(trades) / math.sqrt(len(trades)))
              if len(trades) > 1 and statistics.pstdev(trades) > 0 else 0.0)
     return {
-        "pair": pair, "rule": kind, "params": params,
+        "pair": pair, "rule": kind, "params": params, "exec_lag": exec_lag,
         "start": str(curve[0][0]), "end": str(curve[-1][0]), "days": days,
         "trades": len(trades),
         "win_pct": round(100.0 * len(wins) / len(trades), 1) if trades else 0.0,
@@ -275,14 +282,64 @@ def rule_name(kind, params):
     if kind == "donchian": return "donchian-%d/%d" % params
     return "macross-%d/%d" % params
 
+def portfolio_from_curves(curves_by_pair, trade_rs_all):
+    """curves_by_pair: pair -> {date_str: equity}. Equal-weight slices summed
+    across pairs once every pair has a value (last value carried forward)."""
+    curves = {p: dict(c) for p, c in curves_by_pair.items()}
+    all_days = sorted({d for c in curves.values() for d in c})
+    port, last = [], {}
+    for d in all_days:
+        for p in curves:
+            if d in curves[p]:
+                last[p] = curves[p][d]
+        if len(last) == len(curves):
+            port.append((d, sum(last.values())))
+    if not port:
+        return None
+    eq0 = SLICE_USD * len(curves)
+    peak, maxdd = eq0, 0.0
+    for _, e in port:
+        peak = max(peak, e); maxdd = max(maxdd, (peak - e) / peak)
+    days = (datetime.date.fromisoformat(port[-1][0]) -
+            datetime.date.fromisoformat(port[0][0])).days or 1
+    return {
+        "start": port[0][0], "end": port[-1][0], "curve": port,
+        "return_pct": round(100.0 * (port[-1][1] / eq0 - 1), 2),
+        "cagr_pct": round(100.0 * ((port[-1][1] / eq0) ** (365.25 / days) - 1), 2)
+                    if port[-1][1] > 0 else -100.0,
+        "max_drawdown_pct": round(100.0 * maxdd, 2),
+        "trades": len(trade_rs_all),
+        "avg_r": round(sum(trade_rs_all)/len(trade_rs_all), 4) if trade_rs_all else 0.0,
+        "avg_r_ci95": bootstrap_ci(trade_rs_all)}
+
+ERAS = [("2003-12-01", "2010-12-31"), ("2011-01-01", "2015-12-31"),
+        ("2016-01-01", "2020-12-31"), ("2021-01-01", "2026-11-20")]
+
+def era_returns(port_curve):
+    """Compound return of the portfolio within each era window."""
+    out = {}
+    for a, b in ERAS:
+        before = [p for p in port_curve if p[0] < a]
+        inside = [p for p in port_curve if a <= p[0] <= b]
+        if not inside:
+            continue
+        base = before[-1][1] if before else port_curve[0][1]
+        out["%s..%s" % (a[:4], b[:4])] = round(100.0 * (inside[-1][1] / base - 1), 2)
+    return out
+
 def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else "all"
+    assert mode in ("base", "extra", "all"), "mode: base | extra | all"
     bars_by_pair = {p: load_bars(p) for p in PAIRS}
     conv_cache = {p: usd_per_quote_series(p, bars_by_pair) for p in PAIRS}
     out = {"generated_utc": datetime.datetime.utcnow().isoformat() + "Z",
            "risk_frac": RISK_FRAC, "slice_usd": SLICE_USD,
            "spread_pips": SPREAD_PIPS, "pairs": {}, "portfolio": {},
-           "controls": {}, "gross": {}, "stress2x": {}, "neighbour": {}}
+           "controls": {}, "gross": {}, "stress2x": {}, "neighbour": {},
+           "lags": {}, "eras": {}}
     all_rules = RULES_HEADLINE + RULES_NEIGHBOUR
+    if mode in ("extra",):
+        all_rules = []  # extra mode: lag/era sensitivity only
     for kind, params in all_rules:
         name = rule_name(kind, params)
         for p in PAIRS:
@@ -319,46 +376,56 @@ def main():
                     "min_avg_r": round(min(means), 4) if means else None,
                     "max_avg_r": round(max(means), 4) if means else None}
     # portfolio: equal-weight slices summed across pairs, headline rules
-    for kind, params in RULES_HEADLINE:
+    for kind, params in (RULES_HEADLINE if mode in ("base", "all") else []):
         name = rule_name(kind, params)
-        curves = {p: dict(out["_full"][name][p]["curve"]) for p in PAIRS}
-        all_days = sorted({d for c in curves.values() for d in c})
-        # start when ALL pairs have a curve value (carry last known forward)
-        port = []
-        last = {}
-        for d in all_days:
-            for p in PAIRS:
-                if d in curves[p]:
-                    last[p] = curves[p][d]
-            if len(last) == len(PAIRS):
-                port.append((d, sum(last.values())))
-        if not port:
-            continue
-        eq0 = SLICE_USD * len(PAIRS)
-        peak, maxdd = eq0, 0.0
-        for _, e in port:
-            peak = max(peak, e); maxdd = max(maxdd, (peak - e) / peak)
-        days = (datetime.date.fromisoformat(port[-1][0]) -
-                datetime.date.fromisoformat(port[0][0])).days or 1
+        curves = {p: out["_full"][name][p]["curve"] for p in PAIRS}
         all_rs = [r for p in PAIRS for r in out["_full"][name][p]["trade_rs"]]
-        out["portfolio"][name] = {
-            "start": port[0][0], "end": port[-1][0],
-            "return_pct": round(100.0 * (port[-1][1] / eq0 - 1), 2),
-            "cagr_pct": round(100.0 * ((port[-1][1] / eq0) ** (365.25 / days) - 1), 2),
-            "max_drawdown_pct": round(100.0 * maxdd, 2),
-            "trades": len(all_rs),
-            "avg_r": round(sum(all_rs)/len(all_rs), 4) if all_rs else 0.0,
-            "avg_r_ci95": bootstrap_ci(all_rs)}
+        pf = portfolio_from_curves(curves, all_rs)
+        if pf:
+            out["eras"][name] = era_returns(pf.pop("curve"))
+            out["portfolio"][name] = pf
+    # execution-lag sensitivity: headline rules re-run acting 1 and 2 closes
+    # after the signal close (net costs; same sizing and conventions)
+    for lag in (() if mode == "base" else (1, 2)):
+        for kind, params in RULES_HEADLINE:
+            name = rule_name(kind, params)
+            curves, all_rs = {}, []
+            for p in PAIRS:
+                r = simulate(p, bars_by_pair[p], (kind, params), conv_cache,
+                             bars_by_pair, exec_lag=lag)
+                out["lags"].setdefault(str(lag), {}).setdefault(name, {})[p] = {
+                    "trades": r["trades"], "avg_r": r["avg_r"],
+                    "return_pct": r["return_pct"], "cagr_pct": r["cagr_pct"],
+                    "max_drawdown_pct": r["max_drawdown_pct"], "ruined": r["ruined"]}
+                curves[p] = r["curve"]
+                all_rs += r["trade_rs"]
+            pf = portfolio_from_curves(curves, all_rs)
+            if pf:
+                pf.pop("curve")
+                out["lags"][str(lag)][name]["_portfolio"] = pf
     out.pop("_full", None)
     os.makedirs(RESULTS, exist_ok=True)
-    with open(os.path.join(RESULTS, "daily_trend.json"), "w") as f:
-        json.dump(out, f, indent=1)
-    print("wrote results/daily_trend.json")
-    for name in out["portfolio"]:
-        pf = out["portfolio"][name]
-        print("%-16s ret %8.2f%%  cagr %6.2f%%  maxdd %6.2f%%  trades %5d  avgR %7.4f CI %s"
-              % (name, pf["return_pct"], pf["cagr_pct"], pf["max_drawdown_pct"],
-                 pf["trades"], pf["avg_r"], pf["avg_r_ci95"]))
+    if mode in ("base", "all"):
+        with open(os.path.join(RESULTS, "daily_trend.json"), "w") as f:
+            json.dump(out, f, indent=1)
+        print("wrote results/daily_trend.json")
+        for name in out["portfolio"]:
+            pf = out["portfolio"][name]
+            print("%-16s ret %8.2f%%  cagr %6.2f%%  maxdd %6.2f%%  trades %5d  avgR %7.4f CI %s"
+                  % (name, pf["return_pct"], pf["cagr_pct"], pf["max_drawdown_pct"],
+                     pf["trades"], pf["avg_r"], pf["avg_r_ci95"]))
+    if mode in ("extra", "all"):
+        extra = {"lags": out["lags"]}
+        with open(os.path.join(RESULTS, "daily_trend_extra.json"), "w") as f:
+            json.dump(extra, f, indent=1)
+        print("wrote results/daily_trend_extra.json")
+        for lag in sorted(out["lags"]):
+            for name in out["lags"][lag]:
+                pf = out["lags"][lag][name].get("_portfolio")
+                if pf:
+                    print("lag%s %-16s ret %8.2f%%  cagr %6.2f%%  avgR %7.4f CI %s"
+                          % (lag, name, pf["return_pct"], pf["cagr_pct"],
+                             pf["avg_r"], pf["avg_r_ci95"]))
 
 if __name__ == "__main__":
     main()

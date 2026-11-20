@@ -18,7 +18,9 @@ python3 fx_backtest.py --timeframe 1h   # -> results/backtest_1h.json
 python3 cost_model_check.py  # legacy vs corrected cost model -> results/cost_model_check.json
 python3 fetch_daily.py        # caches Yahoo DAILY bars to ./data (personal use, paced)
 python3 fx_daily_trend.py     # daily trend study -> results/daily_trend.json
-python3 gen_daily_docs.py     # rebuild DAILY-TREND.md from the JSON
+python3 fx_daily_trend.py extra  # execution-lag sensitivity -> results/daily_trend_extra.json
+python3 gen_daily_docs.py     # rebuild DAILY-TREND.md from the JSONs
+python3 test_daily_trend.py     # regression tests: USD conversion, lag mechanics, controls, costs, ruin
 python3 gen_docs.py          # rebuild the markdown reports from the JSONs
 ```
 

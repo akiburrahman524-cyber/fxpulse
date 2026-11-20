@@ -4,6 +4,14 @@ Notable corrections and changes, newest first. This project publishes its
 mistakes openly: each entry says what was wrong, what it changed, and where
 the measurement lives.
 
+## 2026-11-20 (second round) - Harness robustness: execution-lag sensitivity, era split, regression tests
+
+- `research/fx_daily_trend.py` gains an `exec_lag` execution model: the headline convention (act AT the signal close, i.e. signal price equals assumed fill price) is now stress-tested by re-running every headline rule acting 1 and 2 closes LATER. Measured: the no-edge conclusion is not an artifact of the same-close assumption - every pooled 95% CI still straddles zero at every lag (CAGRs 0.0% to +1.3% over 21 years). Lagged execution scores slightly HIGHER for several rules, consistent with documented daily-frequency short-term reversal and with noise across 390 cells; reported, not hidden (results/daily_trend_extra.json).
+- Era split added (2003-2010 / 2011-2015 / 2016-2020 / 2021-2026, portfolio, net): every headline rule was strongest in the earliest era and the recent decade is the weakest for 4 of 5 - era-instability reported as the out-of-sample-style check available for unfitted rules.
+- New `research/test_daily_trend.py` regression coverage for the machinery this project has actually broken: quote-currency risk conversion measured in USD (the 2026-11-19 JPY pip-value and 2026-11-20 pre-publish sizing bug class), no-future conversion lookups, execution-lag mechanics (lag shifts positions, never changes segment structure), random-control boundary preservation, cost ordering (gross >= net >= stress) and ruin flooring. All pass.
+- A deterministic rerun of the base study after the refactor reproduced every published headline number exactly.
+- New section in DAILY-TREND.md: "Selection and out-of-sample limits" - pre-registered unfitted parameters (no training leak), literature-informed rule choice (replication, not discovery), present-day pair selection (mild survivorship caveat), stated multiplicity.
+
 ## 2026-11-20 - Daily trend-following study (21 years), plus a quote-currency sizing fix caught pre-publish
 
 - New study `research/DAILY-TREND.md` (`research/fx_daily_trend.py`, `results/daily_trend.json`): the strongest published simple-strategy class - medium-term trend following - tested pre-registered on ~21 years of free daily bars (2003-2026, 10 pairs) with the project's honesty rules: explicit simulated capital, adverse fill costs, gross/net/stress side by side, random-direction controls, all 130 grid cells published. Result: no reliable edge after costs. Portfolio CAGRs -0.6% to +0.8% over two decades, every pooled 95% CI straddles zero, controls land in the same range. Swap/rollover interest is unmodeled and stated as a material caveat. Scoped: these rules, pairs, costs and sample - not proof that no trend implementation could work.

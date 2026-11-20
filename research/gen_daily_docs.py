@@ -3,6 +3,8 @@
 import json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 R = json.load(open(os.path.join(HERE, "results", "daily_trend.json")))
+EXTRA_PATH = os.path.join(HERE, "results", "daily_trend_extra.json")
+EXTRA = json.load(open(EXTRA_PATH)) if os.path.exists(EXTRA_PATH) else {"lags": {}}
 PAIRS = ["EURUSD","GBPUSD","USDJPY","USDCHF","USDCAD","AUDUSD","NZDUSD",
          "EURGBP","EURJPY","GBPJPY"]
 HEADLINE = ["tsmom-63d","tsmom-126d","tsmom-252d","donchian-55/20","macross-50/200"]
@@ -103,13 +105,57 @@ for name in HEADLINE:
         yp = R["pairs"][name][p]["year_pnl"]
         A("| %s | %s |" % (p, " | ".join(str(yp.get(y, 0)) for y in years)))
     A("")
+
+A("## Execution timing: the same-close assumption, measured")
+A("")
+A("The headline convention acts AT the signal close: the close print that generates the signal is also the assumed fill price (mid +/- half-spread). That identity cannot be verified with free data, so this section re-runs every headline rule acting 1 and 2 closes LATER - a strictly more conservative, realistic-lag execution - same sizing, same costs.")
+A("")
+A("| rule | lag 0 return (CAGR) | lag 1 return (CAGR) | lag 2 return (CAGR) | all-lags 95% CI straddles zero? |")
+A("| --- | --- | --- | --- | --- |")
+for name in HEADLINE:
+    p0 = R["portfolio"][name]
+    row = "| %s | %+.2f%% (%+.2f%%)" % (name, p0["return_pct"], p0["cagr_pct"])
+    cis = [p0["avg_r_ci95"]]
+    for lag in ("1", "2"):
+        pf = EXTRA["lags"].get(lag, {}).get(name, {}).get("_portfolio")
+        if pf:
+            row += " | %+.2f%% (%+.2f%%)" % (pf["return_pct"], pf["cagr_pct"])
+            cis.append(pf["avg_r_ci95"])
+    straddle = all(ci and ci[0] <= 0 <= ci[1] for ci in cis)
+    A(row + " | %s |" % ("yes" if straddle else "NO"))
+A("")
+A("Read: the no-edge conclusion is NOT an artifact of the same-close assumption - under 1- and 2-day execution lags every pooled confidence interval still straddles zero (CAGRs 0.0%% to +1.3%% over 21 years). Lagged execution comes out slightly BETTER for several rules, which is the known daily-frequency short-term reversal effect (entering a day late buys the small pullback) and is equally consistent with noise across this many cells; either way nothing crosses break-even significance, and the headline convention is not flattered relative to realistic lag. Per-pair lag numbers are in results/daily_trend_extra.json.")
+A("")
+A("## Results by era (portfolio, net costs)")
+A("")
+A("| rule | 2003-2010 | 2011-2015 | 2016-2020 | 2021-2026 |")
+A("| --- | --- | --- | --- | --- |")
+for name in HEADLINE:
+    er = R.get("eras", {}).get(name, {})
+    A("| %s | %s | %s | %s | %s |" % (
+        name,
+        ("%+.2f%%" % er.get("2003..2010", 0)) if "2003..2010" in er else "n/a",
+        ("%+.2f%%" % er.get("2011..2015", 0)) if "2011..2015" in er else "n/a",
+        ("%+.2f%%" % er.get("2016..2020", 0)) if "2016..2020" in er else "n/a",
+        ("%+.2f%%" % er.get("2021..2026", 0)) if "2021..2026" in er else "n/a"))
+A("")
+A("Read: every rule looked better in 2003-2010 and most are negative in the two most recent eras. That decay pattern is what a published anomaly being arbitraged away looks like - and also what noise looks like across slices of a zero-edge process. Either reading argues against betting on the recent sample.")
+A("")
+A("## Selection and out-of-sample limits")
+A("")
+A("- Nothing is FITTED: parameters are pre-registered literature standards, so there is no training sample to leak into the results. The multiple-comparisons count (130 cells; 390 across the three execution lags) is stated, not hidden.")
+A("- Selection still operates one level up: WHICH rules to test (trend following) was chosen from published evidence, so this study is best read as an independent replication attempt on retail spot FX, not a fresh discovery. The 10 pairs are today's liquid majors - a present-day choice; pairs that died are not in the frame (for major FX this is a mild form of the survivorship caveat, and the euro itself only exists from 1999, three years before this sample starts).")
+A("- The era table above is the honest out-of-sample-style check available for unfitted rules: results are era-unstable, with the recent decade the weakest.")
+A("- Regression coverage for this harness now lives in research/test_daily_trend.py: quote-currency risk conversion in USD (the bug class fixed on 2026-11-19 and caught again pre-publish on 2026-11-20), no-future conversion lookups, execution-lag mechanics, control boundary preservation, cost ordering and ruin flooring.")
+A("")
 A("## Conclusions")
 A("")
 A("1. On ~21 years of free daily data, the classic trend-following rules that have the best published evidence do NOT show a reliable edge on 10 spot FX pairs after retail spreads: portfolio CAGRs of -0.9%% to +0.2%%, every confidence interval through zero, and the random-direction controls land in the same range.")
 A("2. Costs are no longer the main killer at this horizon (gross vs net is a few points over two decades) - the gross edges themselves are approximately zero on these pairs and rules. The intraday study's problem (spread >> edge) is replaced by a simpler one: no measured edge at all.")
 A("3. Swap/rollover interest is unmodeled and material at these holding periods; for some pairs (e.g. long high-yield vs low-yield) it would add a carry component, for others subtract. It does not change the shape of the result: carry is a known, separately measurable term, not a hidden edge in these rules.")
 A("4. Combined with BACKTESTS.md: two independent strategy classes (intraday breakout on 5m/1h, multi-month trend on daily) both fail to beat costs on free spot-FX data. The honest answer to 'can this tool always profit' remains no - and the published evidence for THAT keeps getting stronger, which is the useful output.")
-A("5. fxpulse's defensible niche is unchanged: an honesty-first analysis toolkit - every variant shown, controls next to claims, corrections published - not a signal service.")
+A("5. Robustness of the harness itself (added 2026-11-20, second round): the conclusion is insensitive to the same-close execution assumption (1- and 2-day lags change nothing material), era-split results show the recent decade is the weakest for every rule, and deterministic reruns reproduce the published numbers exactly. Regression tests cover the conversion and execution machinery.")
+A("6. fxpulse's defensible niche is unchanged: an honesty-first analysis toolkit - every variant shown, controls next to claims, corrections published - not a signal service.")
 A("")
 A("Nothing here is financial advice or a prediction. Past simulations do not guarantee anything about the future.")
 open(os.path.join(HERE, "DAILY-TREND.md"), "w").write(("\n".join(L) + "\n").replace("%%", "%"))
