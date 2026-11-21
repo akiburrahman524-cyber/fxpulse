@@ -59,10 +59,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 502,
-     "avg_r": -0.0775,
-     "return_pct": -38.71,
-     "cagr_pct": -1.92,
+     "trades": 470,
+     "avg_r": -0.096,
+     "return_pct": -41.85,
+     "cagr_pct": -2.13,
      "max_drawdown_pct": 53.15,
      "ruined": false
     },
@@ -85,14 +85,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 21.28,
-     "cagr_pct": 0.94,
-     "max_drawdown_pct": 16.78,
-     "trades": 3720,
-     "avg_r": 0.0521,
+     "return_pct": 20.96,
+     "cagr_pct": 0.93,
+     "max_drawdown_pct": 16.69,
+     "trades": 3688,
+     "avg_r": 0.0508,
      "avg_r_ci95": [
-      -0.0352,
-      0.1431
+      -0.0369,
+      0.1425
      ]
     }
    },
@@ -154,10 +154,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 283,
-     "avg_r": 0.038,
-     "return_pct": -1.15,
-     "cagr_pct": -0.05,
+     "trades": 273,
+     "avg_r": 0.005,
+     "return_pct": -9.62,
+     "cagr_pct": -0.4,
      "max_drawdown_pct": 44.68,
      "ruined": false
     },
@@ -180,14 +180,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 25.84,
-     "cagr_pct": 1.13,
-     "max_drawdown_pct": 22.5,
-     "trades": 2491,
-     "avg_r": 0.1052,
+     "return_pct": 24.99,
+     "cagr_pct": 1.09,
+     "max_drawdown_pct": 22.34,
+     "trades": 2481,
+     "avg_r": 0.1019,
      "avg_r_ci95": [
-      -0.0254,
-      0.2408
+      -0.0299,
+      0.2396
      ]
     }
    },
@@ -249,10 +249,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 204,
-     "avg_r": 0.0828,
-     "return_pct": 0.15,
-     "cagr_pct": 0.01,
+     "trades": 202,
+     "avg_r": 0.0208,
+     "return_pct": -11.43,
+     "cagr_pct": -0.48,
      "max_drawdown_pct": 40.12,
      "ruined": false
     },
@@ -275,14 +275,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 11.84,
-     "cagr_pct": 0.55,
-     "max_drawdown_pct": 16.02,
-     "trades": 1718,
-     "avg_r": 0.0435,
+     "return_pct": 10.69,
+     "cagr_pct": 0.5,
+     "max_drawdown_pct": 16.01,
+     "trades": 1716,
+     "avg_r": 0.0362,
      "avg_r_ci95": [
-      -0.1338,
-      0.2409
+      -0.141,
+      0.2314
      ]
     }
    },
@@ -344,11 +344,11 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 69,
-     "avg_r": -0.8061,
-     "return_pct": -47.18,
-     "cagr_pct": -2.5,
-     "max_drawdown_pct": 54.1,
+     "trades": 64,
+     "avg_r": -0.9076,
+     "return_pct": -48.27,
+     "cagr_pct": -2.58,
+     "max_drawdown_pct": 52.32,
      "ruined": false
     },
     "EURJPY": {
@@ -370,14 +370,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 0.47,
+     "return_pct": 0.36,
      "cagr_pct": 0.02,
-     "max_drawdown_pct": 17.64,
-     "trades": 646,
-     "avg_r": 0.0196,
+     "max_drawdown_pct": 17.59,
+     "trades": 641,
+     "avg_r": 0.0159,
      "avg_r_ci95": [
-      -0.4059,
-      0.4781
+      -0.4127,
+      0.4704
      ]
     }
    },
@@ -439,10 +439,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 42,
-     "avg_r": 0.9835,
-     "return_pct": 35.14,
-     "cagr_pct": 1.2,
+     "trades": 41,
+     "avg_r": 0.6506,
+     "return_pct": 17.81,
+     "cagr_pct": 0.65,
      "max_drawdown_pct": 35.14,
      "ruined": false
     },
@@ -465,14 +465,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 14.37,
-     "cagr_pct": 0.66,
-     "max_drawdown_pct": 19.97,
-     "trades": 371,
-     "avg_r": 0.4231,
+     "return_pct": 12.64,
+     "cagr_pct": 0.58,
+     "max_drawdown_pct": 19.85,
+     "trades": 370,
+     "avg_r": 0.3847,
      "avg_r_ci95": [
-      -0.3506,
-      1.2477
+      -0.3973,
+      1.2155
      ]
     }
    }
@@ -536,10 +536,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 502,
-     "avg_r": 0.0038,
-     "return_pct": -7.98,
-     "cagr_pct": -0.33,
+     "trades": 471,
+     "avg_r": -0.0131,
+     "return_pct": -14.31,
+     "cagr_pct": -0.61,
      "max_drawdown_pct": 52.57,
      "ruined": false
     },
@@ -562,14 +562,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 28.93,
-     "cagr_pct": 1.25,
-     "max_drawdown_pct": 20.77,
-     "trades": 3720,
-     "avg_r": 0.0635,
+     "return_pct": 28.3,
+     "cagr_pct": 1.22,
+     "max_drawdown_pct": 20.57,
+     "trades": 3689,
+     "avg_r": 0.0618,
      "avg_r_ci95": [
-      -0.0236,
-      0.1554
+      -0.0245,
+      0.1544
      ]
     }
    },
@@ -631,10 +631,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 283,
-     "avg_r": -0.0266,
-     "return_pct": -17.59,
-     "cagr_pct": -0.76,
+     "trades": 273,
+     "avg_r": -0.0505,
+     "return_pct": -22.21,
+     "cagr_pct": -0.99,
      "max_drawdown_pct": 43.91,
      "ruined": false
     },
@@ -657,14 +657,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 19.55,
-     "cagr_pct": 0.87,
-     "max_drawdown_pct": 28.11,
-     "trades": 2491,
-     "avg_r": 0.0834,
+     "return_pct": 19.08,
+     "cagr_pct": 0.85,
+     "max_drawdown_pct": 28.06,
+     "trades": 2481,
+     "avg_r": 0.0812,
      "avg_r_ci95": [
-      -0.0463,
-      0.2162
+      -0.0501,
+      0.2184
      ]
     }
    },
@@ -726,11 +726,11 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 204,
-     "avg_r": 0.1745,
-     "return_pct": 19.75,
-     "cagr_pct": 0.72,
-     "max_drawdown_pct": 34.22,
+     "trades": 202,
+     "avg_r": 0.113,
+     "return_pct": 5.78,
+     "cagr_pct": 0.22,
+     "max_drawdown_pct": 34.04,
      "ruined": false
     },
     "EURJPY": {
@@ -752,14 +752,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 13.91,
-     "cagr_pct": 0.64,
-     "max_drawdown_pct": 14.9,
-     "trades": 1717,
-     "avg_r": 0.0684,
+     "return_pct": 12.51,
+     "cagr_pct": 0.58,
+     "max_drawdown_pct": 14.84,
+     "trades": 1715,
+     "avg_r": 0.0611,
      "avg_r_ci95": [
-      -0.1072,
-      0.2601
+      -0.1137,
+      0.247
      ]
     }
    },
@@ -821,11 +821,11 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 69,
-     "avg_r": -0.8281,
-     "return_pct": -48.04,
-     "cagr_pct": -2.57,
-     "max_drawdown_pct": 54.42,
+     "trades": 64,
+     "avg_r": -0.9414,
+     "return_pct": -49.41,
+     "cagr_pct": -2.67,
+     "max_drawdown_pct": 53.0,
      "ruined": false
     },
     "EURJPY": {
@@ -847,14 +847,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": -1.87,
-     "cagr_pct": -0.09,
-     "max_drawdown_pct": 15.88,
-     "trades": 646,
-     "avg_r": 0.0021,
+     "return_pct": -2.01,
+     "cagr_pct": -0.1,
+     "max_drawdown_pct": 15.84,
+     "trades": 641,
+     "avg_r": -0.0027,
      "avg_r_ci95": [
-      -0.4236,
-      0.4525
+      -0.4268,
+      0.4511
      ]
     }
    },
@@ -916,10 +916,10 @@
      "ruined": false
     },
     "EURGBP": {
-     "trades": 42,
-     "avg_r": 1.3101,
-     "return_pct": 54.41,
-     "cagr_pct": 1.74,
+     "trades": 41,
+     "avg_r": 1.0068,
+     "return_pct": 35.7,
+     "cagr_pct": 1.22,
      "max_drawdown_pct": 36.55,
      "ruined": false
     },
@@ -942,14 +942,14 @@
     "_portfolio": {
      "start": "2006-05-15",
      "end": "2026-11-19",
-     "return_pct": 16.48,
-     "cagr_pct": 0.75,
-     "max_drawdown_pct": 19.61,
-     "trades": 371,
-     "avg_r": 0.4485,
+     "return_pct": 14.61,
+     "cagr_pct": 0.67,
+     "max_drawdown_pct": 19.43,
+     "trades": 370,
+     "avg_r": 0.4126,
      "avg_r_ci95": [
-      -0.3302,
-      1.2699
+      -0.3702,
+      1.2482
      ]
     }
    }

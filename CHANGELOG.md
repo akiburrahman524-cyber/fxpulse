@@ -4,6 +4,11 @@ Notable corrections and changes, newest first. This project publishes its
 mistakes openly: each entry says what was wrong, what it changed, and where
 the measurement lives.
 
+## 2026-11-21 - Conversion-availability gate (early-EURGBP future-rate flaw)
+
+- **Wrong:** for pairs whose history starts BEFORE their quote-to-USD conversion source (EURGBP daily bars start 2001-09-09; GBPUSD starts 2003-12-01), the walk-back fallback in `usd_per_quote_on` fell through to the FIRST available rate - up to ~2 years in the future - for sizing and settling early EURGBP trades, contradicting the report's never-a-future-rate claim. Found by checking first-bar dates of every pair against its conversion source, the day after the same checker's USD-sizing catch.
+- **Fixed:** `fx_daily_trend.simulate` now applies a conversion-availability gate - a day with no on-or-before conversion rate is simply not traded. 32 early EURGBP trades removed across the grid; headline numbers moved slightly (e.g. tsmom-63d portfolio -12.12% -> -12.28%, macross-50/200 +18.80% -> +17.15%), every conclusion unchanged (all pooled CIs still straddle zero, all lags, all eras). New regression test: no segment may start before conversion availability, at any execution lag.
+
 ## 2026-11-20 (second round) - Harness robustness: execution-lag sensitivity, era split, regression tests
 
 - `research/fx_daily_trend.py` gains an `exec_lag` execution model: the headline convention (act AT the signal close, i.e. signal price equals assumed fill price) is now stress-tested by re-running every headline rule acting 1 and 2 closes LATER. Measured: the no-edge conclusion is not an artifact of the same-close assumption - every pooled 95% CI still straddles zero at every lag (CAGRs 0.0% to +1.3% over 21 years). Lagged execution scores slightly HIGHER for several rules, consistent with documented daily-frequency short-term reversal and with noise across 390 cells; reported, not hidden (results/daily_trend_extra.json).

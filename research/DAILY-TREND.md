@@ -9,6 +9,7 @@ BACKTESTS.md showed the project's intraday opening-range-breakout rule is a coin
 ## Setup
 
 - Data: Yahoo daily bars, 2003-12-01 to 2026-11-20, 10 pairs, ~5,300-6,600 bars per pair, personal-use feed, raw bars cached locally and NOT committed. Bar timestamps label the session START (23:00 UTC): the week's first daily bar carries a Sunday UTC date and the week's last covers Friday's session under a Thursday UTC date. All pairs share the convention, so cross-pair alignment is unaffected; the ECB cross-check below allows for it.
+- Conversion-availability gate: positions are only sized or settled with a quote-to-USD rate dated on or before the trade day. Where a pair's history starts before its conversion source (EURGBP: 2001-09 vs GBPUSD: 2003-12), the days before the first available rate are not traded (corrected 2026-11-21; previously the walk-back fallback would have used the first available rate, up to ~2 years in the future, for early EURGBP trades - 32 trades removed across the grid).
 - Spot cross-check of the daily closes against official ECB reference rates (Frankfurter), 5 dates x 3 pairs: deviations +0.1% to +1.0% except GBPUSD 2020-03-18 (+2.2%, a COVID-crash day) - consistent with the several hours between the ECB 16:00 CET fixing and the 23:00 UTC session close. Same conclusion as the hourly cross-check in DATA-CORRECTNESS.md: unbiased, not execution-grade.
 - Rules (chosen before looking at any result): **tsmom-63/126/252** (long if the close is above its close 63/126/252 trading days ago, else short), **donchian-55/20** (enter long on a 55-day-high close, exit on a 20-day-low close; symmetric short; the classic Turtle geometry), **macross-50/200** (long while SMA50 > SMA200, else short). Neighbour parameters (tsmom 42/84/168/336, donchian 40/15 and 70/25, macross 25/100 and 100/300) are the sensitivity table below - 13 variants x 10 pairs = 130 cells in total.
 - Execution convention: the signal at a day's close sets the position for the NEXT close-to-close return. No same-close lookahead. No stops - all exits are signal-based, so the intrabar stop/target ambiguity of the intraday study does not arise.
@@ -20,11 +21,11 @@ BACKTESTS.md showed the project's intraday opening-range-breakout rule is a coin
 
 | rule | return | CAGR | max drawdown | trades | avg R/trade | 95% CI |
 | --- | --- | --- | --- | --- | --- | --- |
-| tsmom-63d | -12.12% | -0.63% | 24.33% | 3720 | -0.0158 | [-0.1017 .. +0.0728] |
-| tsmom-126d | +11.98% | +0.55% | 24.43% | 2491 | +0.0526 | [-0.0786 .. +0.1905] |
-| tsmom-252d | +5.92% | +0.28% | 19.27% | 1718 | +0.0257 | [-0.1500 .. +0.2201] |
-| donchian-55/20 | -7.91% | -0.40% | 19.28% | 646 | -0.0854 | [-0.5098 .. +0.3802] |
-| macross-50/200 | +18.80% | +0.84% | 20.29% | 371 | +0.5115 | [-0.2723 .. +1.3576] |
+| tsmom-63d | -12.28% | -0.64% | 24.31% | 3688 | -0.0171 | [-0.1029 .. +0.0741] |
+| tsmom-126d | +11.30% | +0.52% | 24.48% | 2481 | +0.0489 | [-0.0848 .. +0.1884] |
+| tsmom-252d | +4.89% | +0.23% | 19.37% | 1716 | +0.0187 | [-0.1580 .. +0.2143] |
+| donchian-55/20 | -8.02% | -0.41% | 19.23% | 641 | -0.0899 | [-0.5165 .. +0.3790] |
+| macross-50/200 | +17.15% | +0.77% | 20.26% | 370 | +0.4731 | [-0.3215 .. +1.3168] |
 
 Read: over 21 years, NONE of the five pre-registered trend rules beats break-even meaningfully on 10 spot FX pairs at retail spreads. Total returns range from about -17% to +5% over TWO DECADES (CAGR -0.9% to +0.2%), and every pooled 95% confidence interval straddles zero - the samples cannot distinguish any of these rules from break-even. Published trend-following results are stronger, but those are futures portfolios across equity indices, bonds and commodities with institutional costs, leverage and continuous vol-target rebalancing; that is not what a retail spot-FX account can run. Scoped claim: these rules, these pairs, these costs, this sample - not proof that no trend implementation could work.
 
@@ -41,7 +42,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | USDCAD | 390 | 32.3 | -0.0155 | [-0.231 .. +0.228] | -14.61% | -0.68% | 50.67% | no |
 | AUDUSD | 333 | 33.3 | -0.0412 | [-0.328 .. +0.292] | -23.04% | -1.27% | 46.69% | no |
 | NZDUSD | 338 | 32.0 | -0.0734 | [-0.321 .. +0.200] | -29.00% | -1.48% | 49.75% | no |
-| EURGBP | 502 | 31.7 | -0.1191 | [-0.285 .. +0.087] | -50.15% | -2.73% | 60.01% | no |
+| EURGBP | 470 | 32.1 | -0.1361 | [-0.303 .. +0.071] | -51.77% | -2.85% | 57.93% | no |
 | EURJPY | 336 | 31.5 | +0.0824 | [-0.201 .. +0.409] | +16.30% | +0.64% | 42.94% | no |
 | GBPJPY | 330 | 31.8 | +0.0597 | [-0.258 .. +0.439] | +4.88% | +0.21% | 37.87% | no |
 
@@ -56,7 +57,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | USDCAD | 258 | 33.3 | +0.0319 | [-0.305 .. +0.410] | -1.97% | -0.09% | 34.91% | no |
 | AUDUSD | 222 | 33.3 | +0.2065 | [-0.196 .. +0.679] | +41.57% | +1.71% | 32.06% | no |
 | NZDUSD | 275 | 29.5 | -0.1253 | [-0.462 .. +0.273] | -37.18% | -2.00% | 62.79% | no |
-| EURGBP | 283 | 29.0 | -0.0516 | [-0.371 .. +0.338] | -23.04% | -1.03% | 49.01% | no |
+| EURGBP | 273 | 28.6 | -0.0896 | [-0.409 .. +0.293] | -29.89% | -1.40% | 49.01% | no |
 | EURJPY | 276 | 35.5 | +0.0640 | [-0.257 .. +0.429] | +7.13% | +0.29% | 31.94% | no |
 | GBPJPY | 244 | 31.6 | +0.1387 | [-0.341 .. +0.729] | +16.18% | +0.66% | 41.70% | no |
 
@@ -71,7 +72,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | USDCAD | 194 | 30.4 | -0.1552 | [-0.504 .. +0.260] | -30.76% | -1.57% | 49.99% | no |
 | AUDUSD | 113 | 42.5 | +0.2506 | [-0.279 .. +0.903] | +25.84% | +1.13% | 28.40% | no |
 | NZDUSD | 168 | 34.5 | -0.0400 | [-0.434 .. +0.409] | -12.17% | -0.56% | 38.83% | no |
-| EURGBP | 204 | 29.4 | +0.0495 | [-0.458 .. +0.776] | -6.44% | -0.26% | 44.68% | no |
+| EURGBP | 202 | 28.7 | -0.0102 | [-0.513 .. +0.707] | -16.82% | -0.73% | 44.68% | no |
 | EURJPY | 154 | 24.7 | -0.0717 | [-0.554 .. +0.498] | -17.33% | -0.80% | 45.30% | no |
 | GBPJPY | 111 | 34.2 | +0.8736 | [-0.108 .. +2.101] | +121.11% | +3.52% | 24.35% | no |
 
@@ -86,7 +87,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | USDCAD | 62 | 35.5 | +0.2103 | [-0.846 .. +1.363] | +7.20% | +0.30% | 32.14% | no |
 | AUDUSD | 63 | 28.6 | -0.5172 | [-1.742 .. +1.002] | -34.21% | -2.02% | 53.35% | no |
 | NZDUSD | 66 | 30.3 | -0.1141 | [-1.350 .. +1.391] | -16.35% | -0.77% | 38.67% | no |
-| EURGBP | 69 | 29.0 | -0.9032 | [-1.912 .. +0.279] | -50.67% | -2.77% | 56.60% | no |
+| EURGBP | 64 | 28.1 | -1.0129 | [-2.063 .. +0.285] | -51.73% | -2.85% | 55.43% | no |
 | EURJPY | 59 | 40.7 | +0.2450 | [-0.909 .. +1.533] | +8.15% | +0.33% | 27.02% | no |
 | GBPJPY | 66 | 24.2 | -0.5770 | [-2.030 .. +1.246] | -40.58% | -2.24% | 53.41% | no |
 
@@ -101,7 +102,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | USDCAD | 37 | 32.4 | -0.9108 | [-2.780 .. +1.163] | -33.47% | -1.74% | 52.21% | no |
 | AUDUSD | 36 | 41.7 | +0.0530 | [-1.763 .. +1.999] | -3.90% | -0.19% | 44.58% | no |
 | NZDUSD | 42 | 33.3 | +0.0039 | [-1.836 .. +2.151] | -7.96% | -0.36% | 52.49% | no |
-| EURGBP | 42 | 35.7 | +0.8554 | [-1.270 .. +3.351] | +28.31% | +0.99% | 38.21% | no |
+| EURGBP | 41 | 34.1 | +0.5172 | [-1.507 .. +2.961] | +11.75% | +0.44% | 38.21% | no |
 | EURJPY | 39 | 43.6 | +0.5052 | [-1.979 .. +3.308] | +7.08% | +0.29% | 29.95% | no |
 | GBPJPY | 28 | 42.9 | +4.5914 | [0.297 .. +9.690] | +193.09% | +4.79% | 27.22% | no |
 
@@ -109,11 +110,11 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 
 | rule | gross return | net return | stress (2x spread) |
 | --- | --- | --- | --- |
-| tsmom-63d | -8.31% | -12.12% | -15.75% |
-| tsmom-126d | +15.08% | +11.98% | +8.99% |
-| tsmom-252d | +8.07% | +5.92% | +3.84% |
-| donchian-55/20 | -7.26% | -7.91% | -8.56% |
-| macross-50/200 | +19.31% | +18.80% | +18.30% |
+| tsmom-63d | -8.53% | -12.28% | -15.86% |
+| tsmom-126d | +14.33% | +11.30% | +8.36% |
+| tsmom-252d | +6.98% | +4.89% | +2.85% |
+| donchian-55/20 | -7.38% | -8.02% | -8.66% |
+| macross-50/200 | +17.64% | +17.15% | +16.66% |
 
 (gross/stress shown as the mean of per-pair slice returns)
 
@@ -128,7 +129,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-63d | USDCAD | -0.0609 | [-0.5207 .. +0.4336] | -0.0155 |
 | tsmom-63d | AUDUSD | -0.0253 | [-0.5476 .. +0.4716] | -0.0412 |
 | tsmom-63d | NZDUSD | -0.0029 | [-0.5247 .. +0.3683] | -0.0734 |
-| tsmom-63d | EURGBP | -0.0605 | [-0.3765 .. +0.2360] | -0.1191 |
+| tsmom-63d | EURGBP | +0.0300 | [-0.2940 .. +0.2887] | -0.1361 |
 | tsmom-63d | EURJPY | -0.0293 | [-0.6072 .. +0.9100] | +0.0824 |
 | tsmom-63d | GBPJPY | -0.0150 | [-0.5312 .. +0.6824] | +0.0597 |
 | tsmom-126d | EURUSD | -0.3116 | [-1.2955 .. +0.3975] | +0.4589 |
@@ -138,7 +139,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-126d | USDCAD | -0.1074 | [-0.6947 .. +1.0138] | +0.0319 |
 | tsmom-126d | AUDUSD | -0.1444 | [-0.6995 .. +0.8625] | +0.2065 |
 | tsmom-126d | NZDUSD | +0.0498 | [-0.5016 .. +0.6459] | -0.1253 |
-| tsmom-126d | EURGBP | -0.1229 | [-0.7145 .. +0.6483] | -0.0516 |
+| tsmom-126d | EURGBP | +0.0830 | [-0.6447 .. +0.8097] | -0.0896 |
 | tsmom-126d | EURJPY | +0.0537 | [-0.4820 .. +0.4928] | +0.0640 |
 | tsmom-126d | GBPJPY | -0.1361 | [-1.1495 .. +0.6586] | +0.1387 |
 | tsmom-252d | EURUSD | -0.0109 | [-1.3475 .. +1.3621] | -0.1533 |
@@ -148,7 +149,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-252d | USDCAD | +0.1182 | [-0.3330 .. +0.7813] | -0.1552 |
 | tsmom-252d | AUDUSD | -0.2012 | [-0.8592 .. +1.0036] | +0.2506 |
 | tsmom-252d | NZDUSD | +0.0171 | [-0.7359 .. +0.6448] | -0.0400 |
-| tsmom-252d | EURGBP | -0.0500 | [-0.9589 .. +0.9855] | +0.0495 |
+| tsmom-252d | EURGBP | +0.0250 | [-0.8440 .. +0.9735] | -0.0102 |
 | tsmom-252d | EURJPY | +0.1386 | [-1.1943 .. +1.6799] | -0.0717 |
 | tsmom-252d | GBPJPY | -0.3374 | [-2.6584 .. +1.4311] | +0.8736 |
 | donchian-55/20 | EURUSD | +0.1322 | [-1.0704 .. +1.3224] | +0.8486 |
@@ -158,7 +159,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | donchian-55/20 | USDCAD | +0.0324 | [-1.2934 .. +0.8037] | +0.2103 |
 | donchian-55/20 | AUDUSD | +0.0562 | [-1.4401 .. +1.0243] | -0.5172 |
 | donchian-55/20 | NZDUSD | +0.0356 | [-0.9865 .. +1.4786] | -0.1141 |
-| donchian-55/20 | EURGBP | +0.0584 | [-0.8275 .. +0.9095] | -0.9032 |
+| donchian-55/20 | EURGBP | +0.0549 | [-1.5199 .. +0.9956] | -1.0129 |
 | donchian-55/20 | EURJPY | +0.1048 | [-1.0125 .. +1.0253] | +0.2450 |
 | donchian-55/20 | GBPJPY | -0.4604 | [-1.9783 .. +1.2869] | -0.5770 |
 | macross-50/200 | EURUSD | -0.5328 | [-5.1304 .. +4.8976] | +1.4084 |
@@ -168,7 +169,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | macross-50/200 | USDCAD | +0.2758 | [-3.6606 .. +3.5780] | -0.9108 |
 | macross-50/200 | AUDUSD | -0.0768 | [-2.7746 .. +3.9013] | +0.0530 |
 | macross-50/200 | NZDUSD | -0.0598 | [-2.6280 .. +2.1625] | +0.0039 |
-| macross-50/200 | EURGBP | +0.3096 | [-5.3477 .. +5.5107] | +0.8554 |
+| macross-50/200 | EURGBP | +0.6491 | [-7.6919 .. +8.0314] | +0.5172 |
 | macross-50/200 | EURJPY | -0.4658 | [-6.4534 .. +4.2847] | +0.5052 |
 | macross-50/200 | GBPJPY | +0.4502 | [-13.2807 .. +9.7356] | +4.5914 |
 
@@ -183,7 +184,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-42d | USDCAD | 444 | -0.0183 | -18.14% | -0.86% | 46.87% |
 | tsmom-42d | AUDUSD | 425 | +0.0323 | -0.11% | -0.01% | 46.00% |
 | tsmom-42d | NZDUSD | 364 | +0.2003 | +83.59% | +2.68% | 23.90% |
-| tsmom-42d | EURGBP | 581 | -0.1759 | -67.68% | -4.38% | 72.86% |
+| tsmom-42d | EURGBP | 531 | -0.1738 | -63.90% | -3.96% | 68.49% |
 | tsmom-42d | EURJPY | 406 | -0.0171 | -16.33% | -0.75% | 39.34% |
 | tsmom-42d | GBPJPY | 444 | -0.0235 | -23.83% | -1.18% | 51.01% |
 | tsmom-84d | EURUSD | 274 | +0.4544 | +183.49% | +4.64% | 26.51% |
@@ -193,7 +194,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-84d | USDCAD | 328 | -0.0700 | -28.63% | -1.45% | 54.68% |
 | tsmom-84d | AUDUSD | 291 | +0.1201 | +24.74% | +1.08% | 42.89% |
 | tsmom-84d | NZDUSD | 246 | +0.1187 | +16.34% | +0.66% | 48.78% |
-| tsmom-84d | EURGBP | 370 | -0.0781 | -31.92% | -1.51% | 46.64% |
+| tsmom-84d | EURGBP | 343 | -0.0877 | -32.31% | -1.54% | 46.64% |
 | tsmom-84d | EURJPY | 282 | +0.0460 | -0.19% | -0.01% | 30.39% |
 | tsmom-84d | GBPJPY | 264 | +0.1216 | +13.59% | +0.56% | 42.42% |
 | tsmom-168d | EURUSD | 228 | -0.0704 | -25.67% | -1.28% | 43.10% |
@@ -203,7 +204,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-168d | USDCAD | 217 | -0.1967 | -39.29% | -2.13% | 54.82% |
 | tsmom-168d | AUDUSD | 174 | -0.0607 | -15.53% | -0.82% | 46.76% |
 | tsmom-168d | NZDUSD | 264 | -0.0189 | -13.11% | -0.61% | 47.29% |
-| tsmom-168d | EURGBP | 242 | -0.0254 | -20.36% | -0.90% | 46.31% |
+| tsmom-168d | EURGBP | 236 | -0.0836 | -29.96% | -1.40% | 46.31% |
 | tsmom-168d | EURJPY | 220 | +0.1099 | +15.23% | +0.60% | 26.10% |
 | tsmom-168d | GBPJPY | 214 | +0.2482 | +45.34% | +1.64% | 30.73% |
 | tsmom-336d | EURUSD | 184 | -0.4416 | -58.26% | -3.73% | 64.26% |
@@ -213,7 +214,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | tsmom-336d | USDCAD | 162 | +0.1216 | +10.58% | +0.43% | 32.41% |
 | tsmom-336d | AUDUSD | 139 | -0.2834 | -35.66% | -2.13% | 50.74% |
 | tsmom-336d | NZDUSD | 186 | -0.3612 | -50.42% | -3.01% | 57.75% |
-| tsmom-336d | EURGBP | 220 | -0.2424 | -48.40% | -2.59% | 56.98% |
+| tsmom-336d | EURGBP | 220 | -0.2888 | -53.50% | -2.99% | 56.21% |
 | tsmom-336d | EURJPY | 91 | +0.7085 | +72.60% | +2.32% | 19.32% |
 | tsmom-336d | GBPJPY | 83 | +0.9708 | +97.36% | +3.00% | 23.19% |
 | donchian-40/15 | EURUSD | 88 | -0.0735 | -16.74% | -0.79% | 36.38% |
@@ -223,7 +224,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | donchian-40/15 | USDCAD | 80 | +0.1135 | +2.58% | +0.11% | 26.94% |
 | donchian-40/15 | AUDUSD | 76 | -0.1485 | -18.14% | -0.97% | 42.82% |
 | donchian-40/15 | NZDUSD | 90 | -0.3006 | -33.18% | -1.74% | 46.57% |
-| donchian-40/15 | EURGBP | 88 | -0.6721 | -48.95% | -2.63% | 52.71% |
+| donchian-40/15 | EURGBP | 79 | -0.6310 | -43.58% | -2.25% | 49.00% |
 | donchian-40/15 | EURJPY | 80 | +0.0079 | -7.13% | -0.31% | 36.84% |
 | donchian-40/15 | GBPJPY | 79 | -0.3825 | -35.17% | -1.87% | 57.18% |
 | donchian-70/25 | EURUSD | 47 | +1.3928 | +71.97% | +2.39% | 25.29% |
@@ -233,7 +234,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | donchian-70/25 | USDCAD | 51 | +0.3910 | +16.08% | +0.65% | 30.26% |
 | donchian-70/25 | AUDUSD | 51 | -0.4381 | -26.20% | -1.47% | 56.35% |
 | donchian-70/25 | NZDUSD | 60 | -0.3930 | -28.59% | -1.46% | 40.61% |
-| donchian-70/25 | EURGBP | 54 | -0.6321 | -34.32% | -1.65% | 46.78% |
+| donchian-70/25 | EURGBP | 51 | -0.8598 | -39.95% | -2.00% | 45.86% |
 | donchian-70/25 | EURJPY | 52 | +0.3451 | +10.70% | +0.43% | 24.71% |
 | donchian-70/25 | GBPJPY | 51 | -0.0690 | -15.63% | -0.74% | 35.49% |
 | macross-25/100 | EURUSD | 73 | +0.8954 | +61.81% | +2.12% | 26.88% |
@@ -243,7 +244,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | macross-25/100 | USDCAD | 78 | +0.0599 | -5.53% | -0.25% | 54.27% |
 | macross-25/100 | AUDUSD | 70 | -0.2129 | -22.53% | -1.24% | 45.12% |
 | macross-25/100 | NZDUSD | 75 | -0.8989 | -53.54% | -3.28% | 68.13% |
-| macross-25/100 | EURGBP | 89 | +0.1777 | +5.43% | +0.21% | 40.67% |
+| macross-25/100 | EURGBP | 83 | +0.0845 | -2.38% | -0.10% | 40.67% |
 | macross-25/100 | EURJPY | 68 | -0.3421 | -29.45% | -1.45% | 41.80% |
 | macross-25/100 | GBPJPY | 75 | -0.4139 | -37.58% | -2.03% | 54.17% |
 | macross-100/300 | EURUSD | 24 | -0.4884 | -17.44% | -0.83% | 35.25% |
@@ -253,7 +254,7 @@ Read: over 21 years, NONE of the five pre-registered trend rules beats break-eve
 | macross-100/300 | USDCAD | 22 | -0.6266 | -21.27% | -1.03% | 48.32% |
 | macross-100/300 | AUDUSD | 23 | -2.1469 | -45.37% | -2.90% | 64.92% |
 | macross-100/300 | NZDUSD | 34 | -1.2036 | -35.89% | -1.92% | 51.63% |
-| macross-100/300 | EURGBP | 24 | +1.6775 | +21.76% | +0.78% | 40.52% |
+| macross-100/300 | EURGBP | 24 | +1.1467 | +7.18% | +0.28% | 40.52% |
 | macross-100/300 | EURJPY | 24 | -1.4158 | -37.64% | -1.96% | 60.34% |
 | macross-100/300 | GBPJPY | 22 | +5.2472 | +168.95% | +4.40% | 25.80% |
 
@@ -271,7 +272,7 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | USDCAD | 0 | 0 | 13.3 | 49.52 | -32.17 | -4.43 | 215.09 | 195.93 | 79.67 | -233.38 | -106.93 | -34.47 | -101.04 | 91.53 | 98.18 | -78.33 | -47.26 | 11.64 | -206.71 | 49.48 | -52.42 | 3.71 | -24.94 | 41.72 | -3.56 | -14.14 |
 | AUDUSD | 0 | 0 | 0 | 0 | 0 | -22.15 | -15.55 | 221.77 | 15.47 | -16.5 | -166.67 | -130.58 | 137.22 | 208.55 | 0.26 | -77.21 | -43.67 | -0.24 | -25.7 | 119.36 | -51.92 | -45.15 | -32.47 | -109.81 | -162.48 | 2.22 |
 | NZDUSD | 0 | 0 | 0 | 69.67 | -81.21 | 150.65 | -144.24 | 114.91 | 111.14 | -81.11 | -10.75 | 24.42 | 10.64 | 75.09 | 34.42 | 18.84 | -126.91 | 92.9 | 51.49 | -28.78 | -255.22 | 36.78 | -56.16 | -142.17 | -78.17 | -7.13 |
-| EURGBP | 7.1 | 22.0 | -9.24 | 14.47 | -87.23 | -121.29 | 101.82 | 98.77 | 37.6 | -87.17 | 44.62 | 46.21 | 1.96 | -80.06 | -28.76 | -87.83 | -16.99 | -24.89 | -22.76 | -30.07 | -33.5 | -82.63 | -46.18 | -21.1 | 18.39 | -26.83 |
+| EURGBP | 0 | 0 | -20.21 | 14.0 | -84.4 | -117.36 | 98.51 | 95.57 | 36.38 | -84.34 | 43.17 | 44.71 | 1.9 | -77.46 | -27.83 | -84.98 | -16.44 | -24.08 | -22.02 | -29.1 | -32.42 | -79.95 | -44.68 | -20.42 | 17.79 | -25.96 |
 | EURJPY | 0 | 0 | 112.86 | -20.65 | -90.5 | 89.07 | -128.61 | 244.95 | 43.18 | 167.41 | -16.09 | 49.14 | 205.59 | -77.05 | -126.03 | 355.74 | -66.27 | 25.99 | 9.19 | -224.23 | -90.62 | -153.96 | 0.74 | -62.26 | 41.41 | -82.0 |
 | GBPJPY | 0 | 0 | 0 | -143.21 | -83.23 | -29.14 | -42.78 | 281.86 | 42.14 | -101.22 | -91.01 | 82.68 | -5.01 | -79.83 | 22.77 | 276.55 | 1.9 | 18.96 | -20.35 | -79.51 | 58.35 | -20.19 | 2.63 | 16.92 | 43.4 | -66.13 |
 
@@ -285,7 +286,7 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | USDCAD | 0 | 0 | 22.93 | -49.5 | 37.65 | 151.46 | 108.21 | 52.29 | -145.53 | 3.08 | -152.35 | 86.99 | -52.84 | 216.58 | -118.14 | 14.79 | 36.64 | -135.44 | -33.25 | 49.52 | 71.41 | 35.18 | -84.43 | -138.42 | 42.91 |
 | AUDUSD | 0 | 0 | 0 | 0 | 37.86 | 179.16 | 280.92 | 178.41 | -22.39 | -70.08 | -291.06 | 108.66 | -17.59 | 141.63 | -53.7 | -61.28 | 113.34 | -171.48 | 48.99 | 44.75 | 16.27 | 44.12 | -37.41 | -69.42 | 49.54 |
 | NZDUSD | 0 | 0 | 79.74 | -13.21 | 169.35 | -47.66 | 232.79 | 164.63 | -156.62 | -105.68 | -233.4 | -85.5 | 102.44 | 183.59 | -27.78 | -64.13 | -136.88 | -74.03 | -20.7 | -45.02 | 2.05 | -18.69 | -58.43 | -92.53 | -72.67 |
-| EURGBP | 9.74 | 87.12 | 139.63 | -137.99 | -154.15 | 31.37 | 184.62 | -204.04 | -26.2 | -51.11 | 26.3 | 42.17 | 71.69 | 52.94 | 158.22 | 28.15 | -55.13 | -94.31 | -115.22 | 10.69 | -58.16 | -100.68 | -1.74 | -4.52 | -10.97 |
+| EURGBP | 0 | -3.02 | 127.21 | -125.71 | -140.43 | 28.58 | 168.19 | -185.88 | -23.87 | -46.56 | 23.96 | 38.42 | 65.31 | 48.23 | 144.14 | 25.65 | -50.22 | -85.92 | -104.97 | 9.74 | -52.98 | -91.72 | -1.59 | -4.12 | -9.99 |
 | EURJPY | 0 | -125.32 | -29.91 | -54.86 | 174.05 | -29.55 | 44.19 | -55.48 | 79.27 | -104.42 | -79.84 | 178.85 | -37.38 | -58.8 | 80.7 | 83.72 | -33.1 | 51.4 | -48.17 | -44.63 | -43.04 | -4.07 | -27.4 | 104.41 | 74.52 |
 | GBPJPY | 0 | 0 | -30.47 | -162.12 | 135.73 | -69.09 | 367.1 | -220.84 | 145.18 | -9.83 | -98.53 | 204.03 | 62.51 | 14.37 | 345.89 | -24.37 | -20.21 | -45.9 | -162.87 | 80.58 | -163.06 | -45.36 | -94.56 | 19.57 | -28.55 |
 
@@ -299,7 +300,7 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | USDCAD | 0 | 0 | 103.95 | 31.76 | 5.21 | 58.89 | -30.9 | -86.25 | 53.11 | -154.22 | -60.44 | -55.43 | 84.8 | 175.49 | -109.74 | 27.11 | -26.12 | -38.6 | -115.42 | -50.15 | -14.12 | -17.92 | 51.96 | -86.58 | -28.66 |
 | AUDUSD | 0 | 0 | 0 | 0 | 0 | 77.29 | -7.83 | -28.96 | -38.85 | -43.78 | 46.98 | -27.06 | 144.83 | 138.72 | -102.92 | 149.87 | -32.93 | -2.27 | 115.71 | -74.39 | 89.24 | -97.46 | 3.13 | -31.52 | -4.99 |
 | NZDUSD | 0 | 0 | 1.73 | -123.16 | 15.11 | 92.25 | 79.03 | -14.3 | -60.02 | -52.66 | -10.87 | -170.86 | 1.44 | 112.41 | -16.09 | 21.31 | -25.64 | -34.83 | 98.72 | -9.13 | 62.03 | -39.72 | 25.08 | -35.67 | -7.55 |
-| EURGBP | 31.38 | 103.74 | -97.42 | -146.39 | 8.52 | 83.21 | 400.78 | -91.03 | -69.99 | -103.31 | 18.27 | -34.18 | 84.81 | 88.59 | 159.23 | -72.73 | -99.2 | -100.38 | -37.88 | -0.19 | -13.53 | -180.52 | 57.62 | -48.93 | 42.32 |
+| EURGBP | 0 | 16.59 | -94.36 | -130.15 | 7.58 | 73.98 | 356.33 | -80.93 | -62.23 | -91.85 | 16.24 | -30.39 | 75.4 | 78.76 | 141.57 | -64.67 | -88.2 | -89.24 | -33.68 | -0.17 | -12.03 | -160.5 | 51.23 | -43.5 | 37.62 |
 | EURJPY | 0 | 0 | -57.9 | -159.62 | 105.88 | 37.05 | -220.09 | 4.18 | -38.24 | -65.97 | -4.26 | 113.71 | -1.81 | -44.84 | 43.45 | 55.62 | -76.79 | 24.35 | 38.16 | 23.68 | 40.59 | 54.97 | 11.65 | -16.49 | -30.31 |
 | GBPJPY | 0 | 0 | 28.28 | -41.09 | 184.51 | -80.29 | 271.61 | -74.83 | -99.9 | -11.95 | 59.94 | 233.98 | 76.5 | 131.46 | 498.44 | 183.89 | -336.35 | -30.31 | -45.73 | 224.34 | 50.56 | 39.18 | 55.35 | -53.61 | -30.77 |
 
@@ -313,7 +314,7 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | USDCAD | 0 | 0 | 0 | 56.5 | 3.21 | 31.25 | 113.2 | 11.06 | -23.96 | -37.15 | 33.41 | -61.12 | 23.07 | 89.0 | 155.56 | 15.06 | -0.23 | 9.76 | -134.5 | 163.12 | 110.1 | -62.05 | -185.82 | -76.87 | -23.02 | -126.98 |
 | AUDUSD | 0 | 0 | 0 | 0 | 0 | 30.82 | -100.86 | 237.13 | 45.2 | -8.17 | -114.38 | -44.66 | 26.03 | 71.2 | 110.3 | -133.91 | -190.82 | 16.4 | -105.03 | 40.67 | 8.81 | -45.8 | -58.08 | -93.33 | -51.92 | 24.14 |
 | NZDUSD | 0 | 0 | 0 | 52.32 | -130.36 | 155.58 | -56.59 | 172.89 | 71.21 | -64.71 | -99.52 | -22.73 | -112.64 | 5.84 | 195.68 | -62.46 | -147.29 | 10.66 | 26.58 | 29.82 | -28.05 | 26.79 | -7.82 | -50.7 | -71.6 | -43.7 |
-| EURGBP | -5.71 | 21.21 | 7.7 | 4.86 | -104.11 | -107.92 | 22.98 | 31.52 | 16.43 | -19.98 | -41.5 | -5.12 | -0.61 | 46.49 | 30.12 | -1.17 | -96.61 | -27.78 | 17.67 | -35.96 | -9.07 | -84.42 | -47.44 | -68.49 | -27.79 | -9.82 |
+| EURGBP | 0 | 0 | 0 | 4.76 | -101.86 | -105.59 | 22.49 | 30.84 | 16.07 | -19.55 | -40.6 | -5.01 | -0.6 | 45.48 | 29.47 | -1.15 | -94.52 | -27.18 | 17.29 | -35.19 | -8.87 | -82.6 | -46.42 | -67.01 | -27.19 | -9.61 |
 | EURJPY | 0 | 0 | 56.05 | -145.74 | -20.43 | 113.7 | -116.33 | 159.13 | -176.12 | 13.43 | -22.75 | 77.66 | 119.52 | -102.16 | -31.08 | 64.55 | -23.65 | -45.28 | -15.53 | 50.46 | -4.8 | -78.53 | 47.22 | 38.14 | 107.71 | 21.51 |
 | GBPJPY | 0 | 0 | 0 | -172.25 | -85.85 | 114.51 | -5.99 | 388.23 | -161.24 | -134.89 | -95.4 | -40.79 | 86.88 | -68.01 | -61.57 | 183.96 | -110.08 | -67.56 | -56.8 | -58.68 | 29.73 | -73.73 | -23.27 | 81.11 | -56.86 | -10.79 |
 
@@ -327,7 +328,7 @@ With 130 cells in the full grid (13 variants x 10 pairs), about 6-7 cells would 
 | USDCAD | 0 | 0 | 27.45 | -102.5 | 48.05 | 74.16 | 163.55 | -78.27 | -76.28 | -31.28 | -131.05 | -8.67 | -12.9 | 179.73 | -112.05 | -73.91 | 27.84 | -41.91 | -89.62 | 22.33 | 53.77 | -42.97 | 46.88 | -131.68 | -40.84 |
 | AUDUSD | 0 | 0 | 0 | 0 | 0 | 168.43 | -40.25 | 78.5 | -8.72 | -85.74 | -183.93 | 196.27 | -97.14 | 79.9 | -42.61 | -206.29 | -13.7 | 4.92 | 81.5 | -8.73 | -22.22 | -71.42 | 27.07 | 5.8 | 102.64 |
 | NZDUSD | 0 | 0 | 121.15 | -90.37 | 120.79 | 24.65 | 294.13 | 66.12 | 86.93 | 14.91 | -178.45 | -44.52 | 75.37 | 220.03 | 50.55 | -220.76 | -47.2 | -163.42 | 5.66 | -9.18 | 83.79 | -51.88 | -236.28 | -129.41 | -61.53 |
-| EURGBP | 27.83 | 104.69 | 108.46 | -134.71 | -11.17 | 99.34 | 394.33 | -421.34 | -112.61 | 36.88 | 80.36 | 78.34 | 141.63 | -9.98 | 172.24 | -66.46 | -77.9 | -179.5 | -4.68 | 47.7 | 32.16 | -92.11 | 40.46 | -40.82 | 79.5 |
+| EURGBP | 0 | -16.59 | 97.18 | -117.32 | -9.73 | 86.51 | 343.44 | -366.96 | -98.07 | 32.12 | 69.99 | 68.23 | 123.35 | -8.69 | 150.01 | -57.88 | -67.85 | -156.33 | -4.08 | 41.54 | 28.01 | -80.22 | 35.23 | -35.55 | 69.24 |
 | EURJPY | 0 | -69.02 | 26.5 | -70.7 | 162.01 | 59.04 | -58.13 | -40.04 | 138.72 | -50.91 | -99.95 | 193.39 | -223.37 | -99.29 | 91.11 | 86.99 | 12.69 | 37.39 | -18.36 | -113.95 | -32.74 | 62.79 | -48.36 | 123.92 | 4.7 |
 | GBPJPY | 0 | 0 | 7.42 | -75.25 | 186.34 | 26.03 | 367.41 | -163.31 | 188.69 | 83.77 | -126.5 | 338.2 | 110.57 | 95.76 | 562.12 | 306.1 | -42.38 | -267.59 | -236.39 | 246.62 | 65.16 | 29.27 | 112.21 | 148.21 | -24.96 |
 
@@ -337,11 +338,11 @@ The headline convention acts AT the signal close: the close print that generates
 
 | rule | lag 0 return (CAGR) | lag 1 return (CAGR) | lag 2 return (CAGR) | all-lags 95% CI straddles zero? |
 | --- | --- | --- | --- | --- |
-| tsmom-63d | -12.12% (-0.63%) | +21.28% (+0.94%) | +28.93% (+1.25%) | yes |
-| tsmom-126d | +11.98% (+0.55%) | +25.84% (+1.13%) | +19.55% (+0.87%) | yes |
-| tsmom-252d | +5.92% (+0.28%) | +11.84% (+0.55%) | +13.91% (+0.64%) | yes |
-| donchian-55/20 | -7.91% (-0.40%) | +0.47% (+0.02%) | -1.87% (-0.09%) | yes |
-| macross-50/200 | +18.80% (+0.84%) | +14.37% (+0.66%) | +16.48% (+0.75%) | yes |
+| tsmom-63d | -12.28% (-0.64%) | +20.96% (+0.93%) | +28.30% (+1.22%) | yes |
+| tsmom-126d | +11.30% (+0.52%) | +24.99% (+1.09%) | +19.08% (+0.85%) | yes |
+| tsmom-252d | +4.89% (+0.23%) | +10.69% (+0.50%) | +12.51% (+0.58%) | yes |
+| donchian-55/20 | -8.02% (-0.41%) | +0.36% (+0.02%) | -2.01% (-0.10%) | yes |
+| macross-50/200 | +17.15% (+0.77%) | +12.64% (+0.58%) | +14.61% (+0.67%) | yes |
 
 Read: the no-edge conclusion is NOT an artifact of the same-close assumption - under 1- and 2-day execution lags every pooled confidence interval still straddles zero (CAGRs 0.0% to +1.3% over 21 years). Lagged execution comes out slightly BETTER for several rules, which is the known daily-frequency short-term reversal effect (entering a day late buys the small pullback) and is equally consistent with noise across this many cells; either way nothing crosses break-even significance, and the headline convention is not flattered relative to realistic lag. Per-pair lag numbers are in results/daily_trend_extra.json.
 
@@ -349,11 +350,11 @@ Read: the no-edge conclusion is NOT an artifact of the same-close assumption - u
 
 | rule | 2003-2010 | 2011-2015 | 2016-2020 | 2021-2026 |
 | --- | --- | --- | --- | --- |
-| tsmom-63d | +8.85% | +4.27% | -1.15% | -15.29% |
-| tsmom-126d | +18.92% | +6.65% | -6.21% | -8.16% |
-| tsmom-252d | +2.18% | +12.30% | -5.43% | +4.05% |
-| donchian-55/20 | +3.62% | +8.77% | -6.16% | -8.87% |
-| macross-50/200 | +19.48% | +8.22% | -5.75% | -4.21% |
+| tsmom-63d | +8.87% | +4.29% | -1.10% | -15.26% |
+| tsmom-126d | +19.24% | +6.60% | -6.18% | -8.09% |
+| tsmom-252d | +1.80% | +12.42% | -5.30% | +4.24% |
+| donchian-55/20 | +3.64% | +8.78% | -6.14% | -8.83% |
+| macross-50/200 | +19.83% | +7.96% | -5.64% | -4.35% |
 
 Read: every rule looked better in 2003-2010 and most are negative in the two most recent eras. That decay pattern is what a published anomaly being arbitraged away looks like - and also what noise looks like across slices of a zero-edge process. Either reading argues against betting on the recent sample.
 

@@ -154,6 +154,19 @@ def simulate(pair, bars, rule, conv_cache, bars_by_pair, cost_mult=1.0,
             pos[i] = signal_macross(closes, i, fast, slow)
     if exec_lag:
         pos = ([0] * exec_lag + pos[:n - exec_lag])
+    # conversion-availability gate: never size or settle a position with a
+    # rate dated AFTER the trade day. When the conversion series starts
+    # later than this pair (EURGBP: 2001-09 vs GBPUSD: 2003-12), the days
+    # before its first rate are simply not traded. (Found 2026-11-21: the
+    # walk-back fallback in usd_per_quote_on would otherwise have used the
+    # FIRST available rate, up to ~2 years in the future, for early EURGBP
+    # trades - contradicting the published never-future claim.)
+    conv0 = conv_cache.get(pair)
+    if conv0:
+        min_conv = min(conv0)
+        for i in range(n):
+            if pos[i] and utc_date(bars[i]["ts"]) < min_conv:
+                pos[i] = 0
     # segments of constant nonzero position
     seg_id = [ -1 ] * n
     segs = []

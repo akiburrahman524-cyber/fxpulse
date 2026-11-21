@@ -130,6 +130,22 @@ def test_costs_only_hurt_and_ruin_stops():
     assert r["curve"][-1][1] >= 0.0, "equity must never go negative"
     print("ok gross >= net >= stress; ruin floors equity at zero")
 
+def test_no_trade_before_conversion_availability():
+    # synthetic EURGBP-like pair whose GBPUSD conversion starts 40 days late:
+    # every trade must be entered on or after the first conversion date.
+    closes = [1.5 + 0.01 * ((i * 13) % 7 - 3) for i in range(160)]
+    bars = mk_bars(closes)
+    conv_bars = mk_bars([1.6] * 120, start=datetime.date(2020, 3, 1))
+    bb = {"EURGBP": bars, "GBPUSD": conv_bars}
+    conv = {p: T.usd_per_quote_series(p, bb) for p in ["EURGBP", "GBPUSD"]}
+    min_conv = min(conv["EURGBP"])
+    for lag in (0, 1, 2):
+        r = T.simulate("EURGBP", bars, ("tsmom", 10), conv, bb, exec_lag=lag)
+        for seg_start, seg_end in r["segments"]:
+            assert datetime.date.fromisoformat(seg_start) >= min_conv, \
+                "segment entered before conversion availability: %s < %s" % (seg_start, min_conv)
+    print("ok no position before conversion availability (all lags)")
+
 if __name__ == "__main__":
     test_usd_per_quote_direction()
     test_no_future_conversion()
@@ -137,4 +153,5 @@ if __name__ == "__main__":
     test_exec_lag_shifts_positions_not_signals()
     test_control_preserves_boundaries()
     test_costs_only_hurt_and_ruin_stops()
+    test_no_trade_before_conversion_availability()
     print("all daily-trend regression tests pass")
